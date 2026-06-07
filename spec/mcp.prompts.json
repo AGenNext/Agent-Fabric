@@ -1,0 +1,1 @@
+{"name":"Agent-Fabric MCP Prompts","version":"0.1.0","prompts":["fabric.diagnose_drift","fabric.review_proposal","fabric.audit_authority","fabric.explain_state","fabric.reconcile_box","fabric.reconcile_cluster","fabric.reconcile_domain","fabric.trace_commitment","fabric.explain_decision","fabric.health_report"]}
