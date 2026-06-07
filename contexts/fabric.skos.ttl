@@ -1,0 +1,20 @@
+@prefix fabric: <https://fabric.agennext.com/ns#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+
+fabric:RelationshipVocabulary a skos:ConceptScheme ;
+  skos:prefLabel "Fabric Relationship Vocabulary" .
+
+fabric:ownedBy a skos:Concept ; skos:inScheme fabric:RelationshipVocabulary .
+fabric:runsOn a skos:Concept ; skos:inScheme fabric:RelationshipVocabulary .
+fabric:dependsOn a skos:Concept ; skos:inScheme fabric:RelationshipVocabulary .
+fabric:governedBy a skos:Concept ; skos:inScheme fabric:RelationshipVocabulary .
+fabric:authorizedBy a skos:Concept ; skos:inScheme fabric:RelationshipVocabulary .
+fabric:boundBy a skos:Concept ; skos:inScheme fabric:RelationshipVocabulary .
+fabric:delegatesTo a skos:Concept ; skos:inScheme fabric:RelationshipVocabulary .
+fabric:belongsTo a skos:Concept ; skos:inScheme fabric:RelationshipVocabulary .
+fabric:contains a skos:Concept ; skos:inScheme fabric:RelationshipVocabulary .
+fabric:produces a skos:Concept ; skos:inScheme fabric:RelationshipVocabulary .
+fabric:consumes a skos:Concept ; skos:inScheme fabric:RelationshipVocabulary .
+fabric:tracedBy a skos:Concept ; skos:inScheme fabric:RelationshipVocabulary .
+fabric:evidencedBy a skos:Concept ; skos:inScheme fabric:RelationshipVocabulary .
+fabric:reconciles a skos:Concept ; skos:inScheme fabric:RelationshipVocabulary .
