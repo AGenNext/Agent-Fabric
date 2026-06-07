@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.agennext.com/fabric/authority-chain.schema.json",
+  "title": "Fabric AuthorityChain",
+  "type": "object",
+  "required": [
+    "id",
+    "target",
+    "observer",
+    "proposer",
+    "validator",
+    "reconciler",
+    "accountableAuthority",
+    "risk",
+    "status",
+    "trace"
+  ],
+  "properties": {
+    "id": { "type": "string" },
+    "target": { "type": "string" },
+    "observer": { "type": "string" },
+    "proposer": { "type": "string" },
+    "validator": { "type": "string" },
+    "reviewers": { "type": "array", "items": { "type": "string" } },
+    "approvers": { "type": "array", "items": { "type": "string" } },
+    "reconciler": { "type": "string" },
+    "stateProjector": { "type": "string" },
+    "accountableAuthority": { "type": "string" },
+    "risk": { "enum": ["low", "medium", "high", "critical"] },
+    "status": {
+      "enum": ["observed", "proposed", "validated", "reviewed", "approved", "rejected", "reconciled", "projected", "challenged", "retired"]
+    },
+    "trace": { "type": "string" }
+  }
+}
