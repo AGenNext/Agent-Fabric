@@ -1,0 +1,22 @@
+{
+  "name": "Agent-Fabric MCP Tools",
+  "version": "0.1.0",
+  "tools": [
+    { "name": "fabric.create_node", "mutates": true, "requires": ["identity", "trace", "lifecycle"], "touches": ["Node", "Event", "Trace"] },
+    { "name": "fabric.create_relationship", "mutates": true, "requires": ["canonicalPredicate", "evidence", "validation", "reconciliation"], "touches": ["Relationship", "Vocabulary", "Evidence"] },
+    { "name": "fabric.observe", "mutates": true, "requires": ["identity", "intent", "trace"], "touches": ["Event", "Trace", "ObservedState"] },
+    { "name": "fabric.propose", "mutates": true, "requires": ["evidence", "risk", "trace"], "touches": ["GapFillProposal", "RepairProposal", "VocabularyGapProposal"] },
+    { "name": "fabric.validate", "mutates": false, "requires": ["target"], "touches": ["ValidationReport"] },
+    { "name": "fabric.authorize", "mutates": false, "requires": ["actor", "action", "resource", "scope", "risk"], "touches": ["AuthorityRequest", "AuthorityResult"] },
+    { "name": "fabric.approve", "mutates": true, "requires": ["authorityChain", "scope", "trace"], "touches": ["AuthorityChain", "Approval", "Lifecycle"] },
+    { "name": "fabric.reject", "mutates": true, "requires": ["target", "reason", "trace"], "touches": ["Proposal", "Lifecycle"] },
+    { "name": "fabric.commit", "mutates": true, "requires": ["debtor", "creditor", "obligations", "evidence"], "touches": ["CommitmentRecord", "Obligation"] },
+    { "name": "fabric.challenge", "mutates": true, "requires": ["target", "reason", "trace"], "touches": ["Challenge", "Lifecycle", "Reconciliation"] },
+    { "name": "fabric.reconcile", "mutates": true, "requires": ["validation", "authorityResult", "evidence", "risk"], "touches": ["ReconciliationRecord", "ReconciliationPlan", "StateTransition"] },
+    { "name": "fabric.project", "mutates": true, "requires": ["projectionContract", "derivedFrom"], "touches": ["ProjectedState", "StateProjectionContract"] },
+    { "name": "fabric.query", "mutates": false, "requires": ["readAuthority"], "touches": ["Resource", "View", "Projection"] },
+    { "name": "fabric.notify", "mutates": false, "requires": ["trace"], "touches": ["Notification", "Message"] },
+    { "name": "fabric.explain", "mutates": false, "requires": ["evidence"], "touches": ["Evidence", "Trace", "State", "Authority", "Reconciliation"] },
+    { "name": "fabric.health", "mutates": false, "requires": ["target"], "touches": ["Health", "Drift", "Lifecycle"] }
+  ]
+}
