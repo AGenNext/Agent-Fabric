@@ -1,0 +1,36 @@
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix fabric: <https://fabric.agennext.com/ns#> .
+
+fabric:RelationshipShape a sh:NodeShape ;
+  sh:targetClass fabric:Relationship ;
+  sh:property [
+    sh:path fabric:subject ;
+    sh:minCount 1 ;
+  ] ;
+  sh:property [
+    sh:path fabric:predicate ;
+    sh:minCount 1 ;
+  ] ;
+  sh:property [
+    sh:path fabric:object ;
+    sh:minCount 1 ;
+  ] .
+
+fabric:CommitmentShape a sh:NodeShape ;
+  sh:targetClass fabric:CommitmentRecord ;
+  sh:property [
+    sh:path fabric:debtor ;
+    sh:minCount 1 ;
+  ] ;
+  sh:property [
+    sh:path fabric:creditor ;
+    sh:minCount 1 ;
+  ] ;
+  sh:property [
+    sh:path fabric:obligation ;
+    sh:minCount 1 ;
+  ] .
+
+fabric:AuthorityChainShape a sh:NodeShape ;
+  sh:targetClass fabric:AuthorityChain ;
+  sh:closed false .
