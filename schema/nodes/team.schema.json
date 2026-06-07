@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schema.agennext.dev/agent-fabric/nodes/team.schema.json",
+  "title": "Team",
+  "description": "A team grouping of agents and/or humans that act together. Topology and membership are expressed via MEMBER_OF / COLLABORATES_WITH relations.",
+  "allOf": [{ "$ref": "https://schema.agennext.dev/agent-fabric/meta/entity.schema.json" }],
+  "properties": {
+    "kind": { "const": "Team" },
+    "attributes": {
+      "type": "object",
+      "properties": {
+        "mission": { "type": "string" },
+        "topology": { "type": "string", "enum": ["flat", "hierarchical", "hub-and-spoke", "mesh"] },
+        "size": { "type": "integer", "minimum": 0 }
+      },
+      "additionalProperties": true
+    }
+  },
+  "required": ["kind"]
+}

@@ -1,0 +1,59 @@
+{
+  "@context": {
+    "@version": 1.1,
+    "@vocab": "https://schema.agennext.dev/agent-fabric/ns#",
+    "af": "https://schema.agennext.dev/agent-fabric/ns#",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "prov": "http://www.w3.org/ns/prov#",
+    "schema": "https://schema.org/",
+
+    "id": "@id",
+    "kind": "@type",
+
+    "label": "schema:name",
+    "description": "schema:description",
+    "tags": { "@id": "af:tag", "@container": "@set" },
+    "attributes": { "@id": "af:attribute", "@container": "@index" },
+    "state": "af:state",
+
+    "version": "af:version",
+    "revision": "af:revision",
+    "createdAt": { "@id": "af:createdAt", "@type": "xsd:dateTime" },
+    "updatedAt": { "@id": "af:updatedAt", "@type": "xsd:dateTime" },
+    "validFrom": { "@id": "af:validFrom", "@type": "xsd:dateTime" },
+    "validTo": { "@id": "af:validTo", "@type": "xsd:dateTime" },
+    "observedAt": { "@id": "af:observedAt", "@type": "xsd:dateTime" },
+
+    "tenant": "af:tenant",
+    "scope": { "@id": "af:scope", "@type": "@id" },
+
+    "provenance": "af:provenance",
+    "source": "af:source",
+    "assertedBy": { "@id": "af:assertedBy", "@type": "@id" },
+    "evidence": { "@id": "af:evidence", "@type": "@id", "@container": "@set" },
+    "confidence": "af:confidence",
+
+    "from": { "@id": "af:from", "@type": "@id" },
+    "to": { "@id": "af:to", "@type": "@id" },
+    "relation": "af:relation",
+    "directed": "af:directed",
+    "weight": "af:weight",
+
+    "Entity": "af:Entity",
+    "Relation": "af:Relation",
+    "Graph": "af:Graph",
+    "GraphEvent": "af:GraphEvent",
+
+    "Agent": "af:Agent",
+    "Human": "af:Human",
+    "Team": "af:Team",
+    "Tool": "af:Tool",
+    "Skill": "af:Skill",
+    "Runtime": "af:Runtime",
+    "Resource": "af:Resource",
+    "Policy": "af:Policy",
+    "Trace": "af:Trace",
+    "Identity": "af:Identity",
+    "Workspace": "af:Workspace"
+  }
+}

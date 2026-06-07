@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schema.agennext.dev/agent-fabric/meta/relation.schema.json",
+  "title": "Relation",
+  "description": "Base meta-class for every edge in the Agent-Fabric graph. A relation connects two entities under a typed predicate drawn from the relation-type registry. Relations are bitemporal, weighted, and provenance-bearing.",
+  "type": "object",
+  "properties": {
+    "id": {
+      "$ref": "https://schema.agennext.dev/agent-fabric/meta/entity.schema.json#/$defs/iri",
+      "description": "Globally unique, stable IRI for this relation."
+    },
+    "relation": {
+      "type": "string",
+      "description": "Relation type (predicate). Must be a type registered in the relation-type registry.",
+      "enum": [
+        "MEMBER_OF", "OWNS", "HAS_IDENTITY", "ASSUMES_IDENTITY",
+        "USES", "INVOKES", "DEPENDS_ON", "PROVIDES",
+        "RUNS_ON", "DEPLOYED_IN", "SCOPED_TO",
+        "GOVERNED_BY", "GRANTS", "ACCESSES",
+        "TRUSTS", "DELEGATES_TO", "COMMUNICATES_WITH", "COLLABORATES_WITH",
+        "PRODUCED", "EVIDENCED_BY", "DERIVED_FROM"
+      ]
+    },
+    "from": {
+      "$ref": "https://schema.agennext.dev/agent-fabric/meta/entity.schema.json#/$defs/iri",
+      "description": "Tail entity (subject / source vertex) of the relation."
+    },
+    "to": {
+      "$ref": "https://schema.agennext.dev/agent-fabric/meta/entity.schema.json#/$defs/iri",
+      "description": "Head entity (object / target vertex) of the relation."
+    },
+    "directed": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether the relation is directed (from -> to). Symmetric relations (e.g. COMMUNICATES_WITH) may set false."
+    },
+    "weight": {
+      "type": "number",
+      "description": "Numeric strength/cost/frequency of the relation, used for ranking and graph algorithms."
+    },
+    "attributes": {
+      "type": "object",
+      "description": "Relation-type-specific, extensible key/value attributes.",
+      "additionalProperties": true
+    },
+    "state": {
+      "type": "string",
+      "enum": ["proposed", "active", "degraded", "suspended", "retired", "deleted"],
+      "default": "active"
+    },
+    "scope": {
+      "$ref": "https://schema.agennext.dev/agent-fabric/meta/entity.schema.json#/$defs/iri",
+      "description": "Workspace this relation is scoped to."
+    },
+    "tenant": { "type": "string" },
+    "version": { "type": "string", "default": "1" },
+    "revision": { "type": "integer", "minimum": 0 },
+    "validFrom": { "type": "string", "format": "date-time" },
+    "validTo": { "type": "string", "format": "date-time" },
+    "observedAt": { "type": "string", "format": "date-time" },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "updatedAt": { "type": "string", "format": "date-time" },
+    "provenance": {
+      "$ref": "https://schema.agennext.dev/agent-fabric/meta/entity.schema.json#/$defs/provenance"
+    }
+  },
+  "required": ["id", "relation", "from", "to"],
+  "additionalProperties": false
+}

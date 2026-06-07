@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schema.agennext.dev/agent-fabric/meta/event.schema.json",
+  "title": "GraphEvent",
+  "description": "The real-time unit of change in Agent-Fabric. The graph is the left-fold of an ordered stream of GraphEvents. Each event upserts or removes a single entity or relation and carries the metadata needed for ordering, replay, and lineage.",
+  "type": "object",
+  "properties": {
+    "id": {
+      "$ref": "https://schema.agennext.dev/agent-fabric/meta/entity.schema.json#/$defs/iri",
+      "description": "Unique event IRI."
+    },
+    "kind": { "const": "GraphEvent" },
+    "stream": {
+      "type": "string",
+      "description": "Logical stream/partition this event belongs to (e.g. per-tenant or per-workspace)."
+    },
+    "sequence": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Monotonic per-stream sequence number. Defines total order within a stream."
+    },
+    "op": {
+      "type": "string",
+      "description": "Change operation. 'upsert' creates or updates; 'delete' tombstones; 'invalidate' closes valid-time without deletion.",
+      "enum": ["upsert", "delete", "invalidate"]
+    },
+    "target": {
+      "type": "string",
+      "description": "Whether the event applies to a node (entity) or an edge (relation).",
+      "enum": ["node", "edge"]
+    },
+    "occurredAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Valid-time: when the change happened in the world."
+    },
+    "recordedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Transaction-time: when the fabric ingested the event."
+    },
+    "source": {
+      "type": "string",
+      "description": "Producer that emitted the event (connector, agent, platform service)."
+    },
+    "correlationId": {
+      "type": "string",
+      "description": "Groups events belonging to the same logical operation/transaction."
+    },
+    "causationId": {
+      "type": "string",
+      "description": "Id of the event/command that directly caused this event, for lineage."
+    },
+    "payload": {
+      "description": "The full entity or relation body. Required for 'upsert'. For 'delete'/'invalidate' an id-only stub is sufficient.",
+      "oneOf": [
+        { "$ref": "https://schema.agennext.dev/agent-fabric/meta/entity.schema.json" },
+        { "$ref": "https://schema.agennext.dev/agent-fabric/meta/relation.schema.json" }
+      ]
+    }
+  },
+  "required": ["id", "kind", "sequence", "op", "target", "occurredAt", "payload"],
+  "allOf": [
+    {
+      "if": { "properties": { "op": { "const": "upsert" } } },
+      "then": { "required": ["payload"] }
+    }
+  ],
+  "additionalProperties": false
+}

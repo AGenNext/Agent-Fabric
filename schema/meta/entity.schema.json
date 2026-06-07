@@ -1,0 +1,126 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schema.agennext.dev/agent-fabric/meta/entity.schema.json",
+  "title": "Entity",
+  "description": "Base meta-class for every node (vertex) in the Agent-Fabric graph. All concrete node kinds extend this schema. Entities are bitemporal, versioned, and provenance-bearing.",
+  "type": "object",
+  "$defs": {
+    "iri": {
+      "type": "string",
+      "format": "iri-reference",
+      "description": "Stable identifier for a graph element, expressed as an IRI/URN (e.g. 'af:agent/orchestrator-7' or 'urn:agennext:agent:orchestrator-7')."
+    },
+    "provenance": {
+      "type": "object",
+      "description": "Where an assertion came from and how much to trust it.",
+      "properties": {
+        "source": {
+          "type": "string",
+          "description": "System or connector that asserted this element (e.g. 'agent-platform', 'agent-identity', 'discovery-scan')."
+        },
+        "assertedBy": {
+          "$ref": "#/$defs/iri",
+          "description": "Identity of the agent/human/service that asserted this element."
+        },
+        "evidence": {
+          "type": "array",
+          "description": "Trace nodes (af:Trace) that substantiate this assertion.",
+          "items": { "$ref": "#/$defs/iri" },
+          "uniqueItems": true
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Asserter confidence in [0,1]. Absence implies an authoritative (1.0) assertion."
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "properties": {
+    "id": {
+      "$ref": "#/$defs/iri",
+      "description": "Globally unique, stable IRI for this entity."
+    },
+    "kind": {
+      "type": "string",
+      "description": "Node kind. Must be a kind registered in the type registry.",
+      "enum": [
+        "Agent", "Human", "Team", "Tool", "Skill", "Runtime",
+        "Resource", "Policy", "Trace", "Identity", "Workspace"
+      ]
+    },
+    "label": {
+      "type": "string",
+      "description": "Human-readable display name."
+    },
+    "description": {
+      "type": "string",
+      "description": "Free-text description."
+    },
+    "state": {
+      "type": "string",
+      "description": "Lifecycle state of the entity.",
+      "enum": ["proposed", "active", "degraded", "suspended", "retired", "deleted"],
+      "default": "active"
+    },
+    "tags": {
+      "type": "array",
+      "items": { "type": "string" },
+      "uniqueItems": true,
+      "description": "Free-form classification labels."
+    },
+    "attributes": {
+      "type": "object",
+      "description": "Kind-specific, extensible key/value attributes. Concrete node schemas constrain this object.",
+      "additionalProperties": true
+    },
+    "scope": {
+      "$ref": "#/$defs/iri",
+      "description": "Workspace (af:Workspace) this entity is scoped to. Establishes the workspace topology partition."
+    },
+    "tenant": {
+      "type": "string",
+      "description": "Tenant / organization boundary the entity belongs to."
+    },
+    "version": {
+      "type": "string",
+      "description": "Semantic or monotonic version of the entity's definition.",
+      "default": "1"
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Monotonic transaction revision counter, incremented on every committed change."
+    },
+    "validFrom": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Valid-time start: when this fact became true in the modeled world."
+    },
+    "validTo": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Valid-time end: when this fact ceased to be true. Open-ended (current) if omitted."
+    },
+    "observedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Real-time signal: when this entity was last observed/refreshed by the fabric."
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Transaction-time: when the record was first written."
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Transaction-time: when the record was last written."
+    },
+    "provenance": { "$ref": "#/$defs/provenance" }
+  },
+  "required": ["id", "kind"],
+  "additionalProperties": true
+}
