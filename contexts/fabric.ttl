@@ -1,0 +1,102 @@
+@prefix fabric: <https://fabric.agennext.com/ns#> .
+@prefix schema: <https://schema.org/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+
+fabric:Ontology a owl:Ontology ;
+  rdfs:label "Agent-Fabric Ontology" ;
+  rdfs:comment "Canonical ontology for Agent-Fabric operational records, relationships, authority, reconciliation, commitments, and state projection." .
+
+fabric:Node a rdfs:Class ;
+  rdfs:subClassOf schema:Thing ;
+  rdfs:label "Fabric Node" .
+
+fabric:Relationship a rdfs:Class ;
+  rdfs:label "Fabric Relationship" ;
+  rdfs:comment "Typed relationship between two Fabric nodes with evidence, authority, risk, and lifecycle." .
+
+fabric:Intent a rdfs:Class ;
+  rdfs:subClassOf prov:Plan ;
+  rdfs:label "Intent" .
+
+fabric:CommitmentRecord a rdfs:Class ;
+  rdfs:label "Commitment Record" ;
+  rdfs:comment "Operational promise between debtor and creditor under conditions and obligations." .
+
+fabric:GapFillProposal a rdfs:Class ;
+  rdfs:subClassOf prov:Plan ;
+  rdfs:label "Gap Fill Proposal" .
+
+fabric:AuthorityChain a rdfs:Class ;
+  rdfs:label "Authority Chain" .
+
+fabric:ReconciliationRecord a rdfs:Class ;
+  rdfs:subClassOf prov:Activity ;
+  rdfs:label "Reconciliation Record" .
+
+fabric:StateProjectionContract a rdfs:Class ;
+  rdfs:subClassOf prov:Plan ;
+  rdfs:label "State Projection Contract" .
+
+fabric:State a rdfs:Class ;
+  rdfs:label "Fabric State" .
+
+fabric:subject a rdf:Property ;
+  rdfs:domain fabric:Relationship ;
+  rdfs:range fabric:Node .
+
+fabric:predicate a rdf:Property ;
+  rdfs:domain fabric:Relationship .
+
+fabric:object a rdf:Property ;
+  rdfs:domain fabric:Relationship ;
+  rdfs:range fabric:Node .
+
+fabric:evidence a rdf:Property ;
+  rdfs:subPropertyOf prov:wasDerivedFrom .
+
+fabric:risk a rdf:Property .
+fabric:status a rdf:Property .
+fabric:authorityChain a rdf:Property ;
+  rdfs:range fabric:AuthorityChain .
+
+fabric:reconciles a rdf:Property ;
+  rdfs:domain fabric:ReconciliationRecord .
+
+fabric:resultingState a rdf:Property ;
+  rdfs:range fabric:State .
+
+fabric:debtor a rdf:Property ;
+  rdfs:domain fabric:CommitmentRecord ;
+  rdfs:range fabric:Node .
+
+fabric:creditor a rdf:Property ;
+  rdfs:domain fabric:CommitmentRecord ;
+  rdfs:range fabric:Node .
+
+fabric:obligation a rdf:Property ;
+  rdfs:domain fabric:CommitmentRecord .
+
+fabric:observedAt a rdf:Property ;
+  rdfs:range xsd:dateTime .
+
+fabric:recordedAt a rdf:Property ;
+  rdfs:range xsd:dateTime .
+
+fabric:effectiveAt a rdf:Property ;
+  rdfs:range xsd:dateTime .
+
+fabric:validFrom a rdf:Property ;
+  rdfs:range xsd:dateTime .
+
+fabric:validTo a rdf:Property ;
+  rdfs:range xsd:dateTime .
+
+fabric:reconciledAt a rdf:Property ;
+  rdfs:range xsd:dateTime .
+
+fabric:projectedAt a rdf:Property ;
+  rdfs:range xsd:dateTime .
