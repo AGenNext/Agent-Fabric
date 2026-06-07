@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.agennext.com/fabric/reconciliation-record.schema.json",
+  "title": "Fabric ReconciliationRecord",
+  "type": "object",
+  "required": [
+    "id",
+    "target",
+    "desiredState",
+    "observedState",
+    "currentState",
+    "decision",
+    "reason",
+    "risk",
+    "validatorResult",
+    "authorityChain",
+    "resultingState",
+    "trace",
+    "status"
+  ],
+  "properties": {
+    "id": { "type": "string" },
+    "target": { "type": "string" },
+    "desiredState": { "type": "string" },
+    "observedState": { "type": "string" },
+    "currentState": { "type": "string" },
+    "decision": {
+      "enum": [
+        "accepted",
+        "rejected",
+        "needsEvidence",
+        "needsAuthority",
+        "needsContract",
+        "needsIdentity",
+        "needsPolicy",
+        "defer",
+        "quarantine",
+        "escalate",
+        "rollback",
+        "supersede"
+      ]
+    },
+    "reason": { "type": "string" },
+    "risk": { "enum": ["low", "medium", "high", "critical"] },
+    "validatorResult": { "type": "string" },
+    "authorityChain": { "type": "string" },
+    "appliedChanges": { "type": "array", "items": { "type": "string" } },
+    "resultingState": { "type": "string" },
+    "trace": { "type": "string" },
+    "status": { "enum": ["pending", "completed", "failed", "superseded"] }
+  }
+}
