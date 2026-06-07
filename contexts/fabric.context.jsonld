@@ -1,0 +1,26 @@
+{
+  "@context": {
+    "id": "@id",
+    "type": "@type",
+    "schema": "https://schema.org/",
+    "prov": "http://www.w3.org/ns/prov#",
+    "skos": "http://www.w3.org/2004/02/skos/core#",
+    "fabric": "https://fabric.agennext.com/ns#",
+
+    "Node": "fabric:Node",
+    "Relationship": "fabric:Relationship",
+    "CommitmentRecord": "fabric:CommitmentRecord",
+    "GapFillProposal": "fabric:GapFillProposal",
+    "AuthorityChain": "fabric:AuthorityChain",
+    "ReconciliationRecord": "fabric:ReconciliationRecord",
+    "StateProjectionContract": "fabric:StateProjectionContract",
+
+    "subject": {"@id": "fabric:subject"},
+    "predicate": {"@id": "fabric:predicate"},
+    "object": {"@id": "fabric:object"},
+    "evidence": {"@id": "prov:wasDerivedFrom"},
+    "authorityChain": {"@id": "fabric:authorityChain"},
+    "reconciledAt": {"@id": "fabric:reconciledAt"},
+    "projectedAt": {"@id": "fabric:projectedAt"}
+  }
+}
