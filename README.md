@@ -47,3 +47,11 @@ The multi-model, real-time graph meta-model for autonomous agents is defined in:
 - [`schema/`](schema/) — machine-readable JSON Schema (draft 2020-12) + JSON-LD, plus the populated type registry and worked examples.
 
 It is **multi-model** (one heterogeneous graph over 11 node kinds and 21 relation types), **real-time** (the graph is the left-fold of an ordered `GraphEvent` stream, with watermarked snapshots), and a **meta-model** (node kinds and predicates are first-class, versioned data in the type registry).
+
+### Authoring (Fabric Agent Language)
+
+For human-friendly authoring, [`spec/dsl.md`](spec/dsl.md) defines **FAL** — an indentation-style `.af` language that compiles to schema-valid graph JSON via [`tools/afc.py`](tools/afc.py):
+
+```bash
+python tools/afc.py examples/research.af --validate
+```
