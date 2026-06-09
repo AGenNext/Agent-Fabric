@@ -21,3 +21,23 @@ output (only with `--validate`).
 The compiler reads the relation/kind vocabulary from
 `schema/registry/registry.json`, so adding a kind or predicate there
 immediately makes it usable in `.af` files.
+
+## bql — Blockquote Query Language evaluator
+
+`bql.py` queries a compiled `Graph` JSON by traversing typed edges, using `>`
+(and `<` for reverse) as the hop operator. See [`../spec/bql.md`](../spec/bql.md).
+
+```bash
+# agents the orchestrator delegates to
+python tools/bql.py examples/research.graph.json \
+  "agent:orchestrator-7 > delegates_to > agent"
+
+# multi-hop with attribute filters
+python tools/bql.py examples/research.graph.json \
+  "agent:orchestrator-7 > delegates_to > agent[status=busy] > runs_on > runtime[platform=kubernetes]"
+
+# full node objects
+python tools/bql.py examples/research.graph.json "agent" --json
+```
+
+Exit codes: `0` ok · `2` query syntax error.

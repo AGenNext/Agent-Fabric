@@ -1,0 +1,20 @@
+# Sample BQL queries against examples/research.graph.json
+# Run one with:  python tools/bql.py examples/research.graph.json -f <(sed -n '1,2p' examples/queries.bql)
+# or just pass a single query string on the command line.
+
+# All agents
+agent
+
+# Who does the orchestrator delegate to?
+agent:orchestrator-7 > delegates_to > agent
+
+# Which busy agents run on a kubernetes runtime, reached via delegation?
+agent:orchestrator-7
+  > delegates_to > agent[status=busy]
+  > runs_on > runtime[platform=kubernetes]
+
+# Reverse: which agents use the web-search tool?
+tool:web-search < uses < agent
+
+# Any relation out of a policy that lands on a tool
+policy:web-readonly > * > tool

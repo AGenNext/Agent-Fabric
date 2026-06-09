@@ -55,3 +55,12 @@ For human-friendly authoring, [`spec/dsl.md`](spec/dsl.md) defines **FAL** — a
 ```bash
 python tools/afc.py examples/research.af --validate
 ```
+
+### Querying (Blockquote Query Language)
+
+[`spec/bql.md`](spec/bql.md) defines **BQL** — a path-traversal query language that uses `>` as the hop operator (`<` for reverse), evaluated by [`tools/bql.py`](tools/bql.py):
+
+```bash
+python tools/bql.py examples/research.graph.json \
+  "agent:orchestrator-7 > delegates_to > agent > runs_on > runtime"
+```
