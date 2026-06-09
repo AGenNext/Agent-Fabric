@@ -211,6 +211,57 @@ def compile_source(text):
     return graph
 
 
+def builtin_check(graph):
+    """Zero-dependency structural validation of a compiled graph.
+
+    Used as a fallback when the `jsonschema` package isn't installed, so the
+    toolchain needs nothing beyond a stock Python interpreter. Checks the
+    invariants the meta-model relies on: required fields, registered kinds and
+    predicates, and referential integrity of edge endpoints.
+    """
+    kinds, predicates = load_registry()
+    valid_kinds = set(kinds.values())
+    errs, ids = [], set()
+    for n in graph.get("nodes", []):
+        if "id" not in n or "kind" not in n:
+            errs.append(f"node missing id/kind: {n.get('id', n)}")
+        if n.get("kind") not in valid_kinds:
+            errs.append(f"unregistered node kind: {n.get('kind')!r} ({n.get('id')})")
+        ids.add(n.get("id"))
+    for e in graph.get("edges", []):
+        for k in ("id", "relation", "from", "to"):
+            if k not in e:
+                errs.append(f"edge missing {k}: {e.get('id', e)}")
+        if e.get("relation", "").lower() not in predicates:
+            errs.append(f"unregistered relation: {e.get('relation')!r} ({e.get('id')})")
+        if e.get("from") not in ids:
+            errs.append(f"dangling 'from': {e.get('id')} -> {e.get('from')}")
+        if e.get("to") not in ids:
+            errs.append(f"dangling 'to': {e.get('id')} -> {e.get('to')}")
+    return errs
+
+
+def validate_graph(graph):
+    """Validate a graph, preferring full JSON Schema but falling back to the
+    built-in check. Returns (errors, mode)."""
+    import glob
+    try:
+        from jsonschema import Draft202012Validator
+        from referencing import Registry, Resource
+    except ImportError:
+        return builtin_check(graph), "builtin (zero-dependency)"
+    res = []
+    for f in glob.glob(os.path.join(ROOT, "schema", "**", "*.json"), recursive=True):
+        d = json.load(open(f))
+        if "$id" in d:
+            res.append((d["$id"], Resource.from_contents(d)))
+    reg = Registry().with_resources(res)
+    schema = json.load(open(os.path.join(ROOT, "schema", "meta", "graph.schema.json")))
+    errs = [f"{list(e.path)} {e.message}"
+            for e in Draft202012Validator(schema, registry=reg).iter_errors(graph)]
+    return errs, "jsonschema"
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(description="Compile FAL (.af) to Agent-Fabric graph JSON.")
     ap.add_argument("source")
@@ -232,23 +283,13 @@ def main(argv=None):
         print(out)
 
     if args.validate:
-        import glob
-        from jsonschema import Draft202012Validator
-        from referencing import Registry, Resource
-        res = []
-        for f in glob.glob(os.path.join(ROOT, "schema", "**", "*.json"), recursive=True):
-            d = json.load(open(f))
-            if "$id" in d:
-                res.append((d["$id"], Resource.from_contents(d)))
-        reg = Registry().with_resources(res)
-        schema = json.load(open(os.path.join(ROOT, "schema", "meta", "graph.schema.json")))
-        errs = list(Draft202012Validator(schema, registry=reg).iter_errors(graph))
+        errs, mode = validate_graph(graph)
         if errs:
             for e in errs[:10]:
-                print(f"afc: INVALID {list(e.path)} {e.message}", file=sys.stderr)
+                print(f"afc: INVALID {e}", file=sys.stderr)
             return 1
-        print(f"afc: valid — {len(graph['nodes'])} nodes, {len(graph['edges'])} edges",
-              file=sys.stderr)
+        print(f"afc: valid [{mode}] — {len(graph['nodes'])} nodes, "
+              f"{len(graph['edges'])} edges", file=sys.stderr)
     return 0
 
 

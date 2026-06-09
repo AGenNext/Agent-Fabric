@@ -17,7 +17,13 @@ python tools/afc.py examples/research.af -o examples/research.graph.json --valid
 Exit codes: `0` success · `2` FAL syntax/semantic error · `1` schema-invalid
 output (only with `--validate`).
 
-`--validate` requires `jsonschema` and `referencing` (`pip install jsonschema`).
+**Footprint:** both tools run on a stock Python interpreter — no third-party
+packages, no GPU, no server. `--validate` uses `jsonschema` for full JSON Schema
+validation *if it is installed*, and otherwise falls back automatically to a
+built-in zero-dependency structural check (registered kinds/predicates, required
+fields, referential integrity). The mode is printed, e.g.
+`afc: valid [builtin (zero-dependency)] — 10 nodes, 12 edges`.
+
 The compiler reads the relation/kind vocabulary from
 `schema/registry/registry.json`, so adding a kind or predicate there
 immediately makes it usable in `.af` files.
