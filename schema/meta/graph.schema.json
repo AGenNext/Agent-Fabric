@@ -47,8 +47,8 @@
     },
     "nodes": {
       "type": "array",
-      "description": "Entities in the snapshot.",
-      "items": { "$ref": "https://schema.agennext.dev/agent-fabric/meta/entity.schema.json" }
+      "description": "Entities in the snapshot, each validated against its concrete node-kind schema.",
+      "items": { "$ref": "https://schema.agennext.dev/agent-fabric/nodes/node.schema.json" }
     },
     "edges": {
       "type": "array",

@@ -53,5 +53,16 @@
       "to": "af:agent/researcher-3",
       "validTo": "2026-06-07T12:05:00Z"
     }
+  },
+  {
+    "id": "af:event/1004",
+    "kind": "GraphEvent",
+    "stream": "agennext.core",
+    "sequence": 46,
+    "op": "delete",
+    "target": "node",
+    "occurredAt": "2026-06-07T12:10:00Z",
+    "source": "agent-platform",
+    "payload": { "id": "af:agent/researcher-3" }
   }
 ]

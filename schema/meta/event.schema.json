@@ -52,18 +52,37 @@
       "description": "Id of the event/command that directly caused this event, for lineage."
     },
     "payload": {
-      "description": "The full entity or relation body. Required for 'upsert'. For 'delete'/'invalidate' an id-only stub is sufficient.",
-      "oneOf": [
-        { "$ref": "https://schema.agennext.dev/agent-fabric/meta/entity.schema.json" },
-        { "$ref": "https://schema.agennext.dev/agent-fabric/meta/relation.schema.json" }
-      ]
+      "type": "object",
+      "description": "For 'upsert', the full node (validated against its concrete kind) or relation body. For 'delete'/'invalidate', an id-only stub is sufficient (a fuller body is also accepted).",
+      "properties": {
+        "id": { "$ref": "https://schema.agennext.dev/agent-fabric/meta/entity.schema.json#/$defs/iri" }
+      },
+      "required": ["id"]
     }
   },
   "required": ["id", "kind", "sequence", "op", "target", "occurredAt", "payload"],
   "allOf": [
     {
-      "if": { "properties": { "op": { "const": "upsert" } } },
-      "then": { "required": ["payload"] }
+      "if": {
+        "properties": { "op": { "const": "upsert" }, "target": { "const": "node" } },
+        "required": ["op", "target"]
+      },
+      "then": {
+        "properties": {
+          "payload": { "$ref": "https://schema.agennext.dev/agent-fabric/nodes/node.schema.json" }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": { "op": { "const": "upsert" }, "target": { "const": "edge" } },
+        "required": ["op", "target"]
+      },
+      "then": {
+        "properties": {
+          "payload": { "$ref": "https://schema.agennext.dev/agent-fabric/meta/relation.schema.json" }
+        }
+      }
     }
   ],
   "additionalProperties": false
