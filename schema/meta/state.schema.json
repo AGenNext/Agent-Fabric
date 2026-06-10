@@ -5,5 +5,5 @@
   "description": "The lifecycle state vocabulary shared by entities and relations. Single source of truth, referenced wherever a state appears and mirrored in schema/registry/states.json.",
   "type": "string",
   "enum": ["proposed", "active", "degraded", "suspended", "retired", "deleted"],
-  "default": "active"
+  "default": "proposed"
 }

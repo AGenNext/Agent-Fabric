@@ -9,6 +9,7 @@ mains, so `fab compile` == `afc`, `fab query` == `bql`, `fab sim` == `sim`.
     fab sim     BASE.json EVENTS.json [--explode] ...    # emulate (sim)
     fab vocab                                            # print the shipped vocabulary
     fab grade   GRAPH.json [--json]                      # score model quality
+    fab migrate GRAPH.json [--min-quality N]             # promote proposals -> active
     fab test                                             # run the e2e suite
 
 Pure standard library; no install.
@@ -140,6 +141,9 @@ def main(argv=None):
     if cmd in ("grade", "quality", "lint"):
         import grade
         return grade.main(rest)
+    if cmd in ("migrate", "promote"):
+        import migrate
+        return migrate.main(rest)
     if cmd in ("test", "e2e"):
         import runpy
         try:

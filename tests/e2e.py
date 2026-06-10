@@ -119,6 +119,21 @@ check("kernel rejects an unregistered kind at ingestion", rejected)
 check("valid stream still folds under enforcement",
       kernel_mod.GraphKernel(base, events).view()[1]["events_applied"] == len(events))
 
+print("== lifecycle: proposal -> migrate -> active ==")
+import migrate as migrate_mod   # noqa: E402
+check("authored elements are proposals by default (state unset)",
+      all("state" not in n for n in graph["nodes"]))
+migrated, mreport = migrate_mod.migrate(graph)
+check("migration promotes every proposal to active",
+      all(n["state"] == "active" for n in migrated["nodes"])
+      and mreport["promoted"] == mreport["total"])
+try:
+    migrate_mod.migrate(graph, min_quality=95)
+    gated = False
+except ValueError:
+    gated = True
+check("migration quality gate refuses a low-quality model", gated)
+
 print("== quality grading (correctness vs quality) ==")
 import grade as grade_mod   # noqa: E402
 gscore, gcrit = grade_mod.grade(graph)

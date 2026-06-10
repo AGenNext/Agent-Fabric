@@ -383,6 +383,13 @@ since events may arrive out of order.
 domain/range; (3) deterministic replay; (4) lossless graph↔log round-trip;
 (5) bitemporal + provenance on every element.
 
+**Lifecycle: proposal → migrate → active.** Everything starts as a **proposal**
+(`state` defaults to `proposed`). Promotion is the supported migration path:
+`fab migrate` gates on correctness (the model must validate) and, optionally, a
+minimum quality score, then promotes every `proposed`/unset element to `active`.
+Nothing becomes active until correctness is enforced — proposals first,
+migration second.
+
 **Conformance suite** (`tests/e2e.py`, run via `fab test`) asserts, end to end:
 
 - *authoring* — `research.af` compiles to the committed graph; it validates;
