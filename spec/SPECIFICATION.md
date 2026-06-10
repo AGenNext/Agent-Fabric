@@ -369,11 +369,15 @@ subcommand is also runnable as its own script.
 
 ## 14. Validation & conformance
 
-**Validation modes.** `afc --validate` uses JSON Schema (draft 2020-12) with a
-cross-file `$ref` registry when `jsonschema` is installed, and otherwise falls
-back automatically to a built-in zero-dependency structural check (registered
-kinds/predicates, required fields, edge referential integrity). The active mode
-is reported.
+**Correctness is enforced, not optional.** The compiler always validates and
+**never emits an invalid graph** (`--validate` only adds a summary line). The
+kernel **validates every event at ingestion** (registered kind/predicate,
+required fields) and rejects violations with a `KernelError` before they touch
+the store — sanitize at source. Validation uses JSON Schema (draft 2020-12) with
+a cross-file `$ref` registry when `jsonschema` is installed, falling back
+automatically to a built-in zero-dependency structural check. Order-dependent
+referential integrity is checked at the graph level (validation / `grade`),
+since events may arrive out of order.
 
 **The five guarantees.** (1) schema-valid output; (2) registry-bound with
 domain/range; (3) deterministic replay; (4) lossless graph↔log round-trip;

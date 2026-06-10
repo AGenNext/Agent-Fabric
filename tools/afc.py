@@ -265,7 +265,7 @@ def main(argv=None):
     ap.add_argument("source")
     ap.add_argument("-o", "--out", help="write JSON here (default: stdout)")
     ap.add_argument("--validate", action="store_true",
-                    help="validate output against graph.schema.json (needs jsonschema)")
+                    help="also print the validation summary (correctness is always enforced)")
     args = ap.parse_args(argv)
 
     try:
@@ -275,21 +275,22 @@ def main(argv=None):
         print(f"afc: {e}", file=sys.stderr)
         return 2
 
+    # Correctness is enforced, not optional: an invalid graph is never emitted.
+    errs, mode = validate_graph(graph)
+    if errs:
+        for e in errs[:10]:
+            print(f"afc: INVALID {e}", file=sys.stderr)
+        return 1
+    if args.validate:
+        print(f"afc: valid [{mode}] — {len(graph['nodes'])} nodes, "
+              f"{len(graph['edges'])} edges", file=sys.stderr)
+
     out = json.dumps(graph, indent=2)
     if args.out:
         with open(args.out, "w") as fh:
             fh.write(out + "\n")
     else:
         print(out)
-
-    if args.validate:
-        errs, mode = validate_graph(graph)
-        if errs:
-            for e in errs[:10]:
-                print(f"afc: INVALID {e}", file=sys.stderr)
-            return 1
-        print(f"afc: valid [{mode}] — {len(graph['nodes'])} nodes, "
-              f"{len(graph['edges'])} edges", file=sys.stderr)
     return 0
 
 

@@ -7,6 +7,38 @@ the `until` watermark) and every read reflects it — no projected subgraph need
 to be built or stored. `sim` and `bql --events` both read through this one
 kernel, so the fold semantics live in a single place. Pure standard library.
 """
+import os
+import sys
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from fabriclib import load_registry
+
+
+class KernelError(ValueError):
+    """An event violated correctness at ingestion."""
+
+
+def _enforce(ev):
+    """Enforce intrinsic correctness on an event before it touches the store:
+    a payload id, and — for upserts — a registered kind (nodes) or registered
+    predicate with from/to (edges). Order-dependent checks (referential
+    integrity) are left to graph-level validation, since events may arrive
+    out of order. Raises KernelError on violation."""
+    kinds, preds = load_registry()
+    p = ev.get("payload") or {}
+    eid = ev.get("id", "?")
+    if "id" not in p:
+        raise KernelError(f"event {eid}: payload has no id")
+    if ev.get("op") == "upsert":
+        if ev.get("target") == "node":
+            if p.get("kind") not in set(kinds.values()):
+                raise KernelError(f"event {eid}: unregistered node kind {p.get('kind')!r}")
+        else:
+            for k in ("relation", "from", "to"):
+                if k not in p:
+                    raise KernelError(f"event {eid}: edge payload missing {k!r}")
+            if p["relation"].lower() not in preds:
+                raise KernelError(f"event {eid}: unregistered relation {p['relation']!r}")
 
 
 def _seq(ev):
@@ -46,10 +78,11 @@ class GraphKernel:
     computed transiently on read, so there is no persisted subgraph. `until`
     bounds the overlay to events with sequence <= until."""
 
-    def __init__(self, base, events=None, until=None):
+    def __init__(self, base, events=None, until=None, strict=True):
         self.base = base
         self.events = sorted(events or [], key=_seq)
         self.until = until
+        self.strict = strict
 
     def _overlay(self):
         nodes = {n["id"]: dict(n) for n in self.base.get("nodes", [])}
@@ -59,6 +92,8 @@ class GraphKernel:
             seq = _seq(ev)
             if self.until is not None and seq > self.until:
                 break
+            if self.strict:
+                _enforce(ev)
             store = nodes if ev["target"] == "node" else edges
             pid = ev["payload"]["id"]
             op = ev["op"]

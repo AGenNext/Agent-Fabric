@@ -105,6 +105,20 @@ check("generated SDK vocabulary matches the registry (no drift)",
       and sdk_vocab["relationPredicates"] == reg_preds
       and sdk_vocab["lifecycleStates"] == state_reg)
 
+print("== correctness enforcement ==")
+import kernel as kernel_mod   # noqa: E402
+bad_event = {"id": "af:event/bad", "kind": "GraphEvent", "sequence": 99,
+             "op": "upsert", "target": "node", "occurredAt": "2026-06-10T00:00:00Z",
+             "payload": {"id": "af:wizard/x", "kind": "Wizard"}}
+try:
+    kernel_mod.GraphKernel(base, [bad_event]).view()
+    rejected = False
+except kernel_mod.KernelError:
+    rejected = True
+check("kernel rejects an unregistered kind at ingestion", rejected)
+check("valid stream still folds under enforcement",
+      kernel_mod.GraphKernel(base, events).view()[1]["events_applied"] == len(events))
+
 print("== quality grading (correctness vs quality) ==")
 import grade as grade_mod   # noqa: E402
 gscore, gcrit = grade_mod.grade(graph)
