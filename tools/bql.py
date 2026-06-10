@@ -20,19 +20,13 @@ A selector with no kind is `*`. Filters match node fields then attributes.
 """
 import argparse
 import json
+import os
 import re
 import sys
+from collections import defaultdict
 
-
-def coerce(v):
-    if isinstance(v, str):
-        if v in ("true", "false"):
-            return v == "true"
-        if re.fullmatch(r"-?\d+", v):
-            return int(v)
-        if re.fullmatch(r"-?\d*\.\d+", v):
-            return float(v)
-    return v
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from fabriclib import coerce, read_json
 
 
 # ---------------------------------------------------------------- tokenizer ---
@@ -130,24 +124,27 @@ def parse(tokens):
 # ------------------------------------------------------------------ evaluate ---
 def evaluate(graph, query):
     nodes = {n["id"]: n for n in graph["nodes"]}
-    edges = graph["edges"]
+    # Index every edge once by its endpoints; hops are then dict lookups, not
+    # scans of the whole edge list. out_index[from] / in_index[to] -> edges.
+    out_index, in_index = defaultdict(list), defaultdict(list)
+    for e in graph["edges"]:
+        out_index[e["from"]].append(e)
+        in_index[e["to"]].append(e)
     start, hops = parse(tokenize(query))
 
     current = [n["id"] for n in graph["nodes"] if start.match(n)]
     for direction, predicate, sel in hops:
+        forward = direction == "forward"
+        index = out_index if forward else in_index
+        endpoint = "to" if forward else "from"
         nxt, seen = [], set()
         for nid in current:
-            for e in edges:
+            for e in index[nid]:
                 if predicate != "*" and e["relation"].lower() != predicate:
                     continue
-                if direction == "forward" and e["from"] == nid:
-                    neigh = e["to"]
-                elif direction == "reverse" and e["to"] == nid:
-                    neigh = e["from"]
-                else:
-                    continue
+                neigh = e[endpoint]
                 node = nodes.get(neigh)
-                if node and sel.match(node) and neigh not in seen:
+                if node and neigh not in seen and sel.match(node):
                     seen.add(neigh)
                     nxt.append(neigh)
         current = nxt
@@ -162,11 +159,15 @@ def main(argv=None):
     ap.add_argument("--json", action="store_true", help="emit full node objects as JSON")
     args = ap.parse_args(argv)
 
-    q = open(args.file).read() if args.file else args.query
+    if args.file:
+        with open(args.file) as fh:
+            q = fh.read()
+    else:
+        q = args.query
     if not q:
         ap.error("provide a query string or -f FILE")
 
-    graph = json.load(open(args.graph))
+    graph = read_json(args.graph)
     try:
         results = evaluate(graph, q)
     except ValueError as e:

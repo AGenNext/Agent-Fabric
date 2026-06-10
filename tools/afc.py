@@ -34,36 +34,15 @@ import os
 import re
 import sys
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-REGISTRY = os.path.join(ROOT, "schema", "registry", "registry.json")
-CONTEXT = "https://schema.agennext.dev/agent-fabric/context.jsonld"
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from fabriclib import ROOT, coerce, load_registry, read_json, reserved_fields
 
-RESERVED = {"label", "description", "scope", "tenant", "state", "version", "tags"}
+CONTEXT = "https://schema.agennext.dev/agent-fabric/context.jsonld"
 NAME_RE = re.compile(r"^[A-Za-z][A-Za-z0-9._-]*$")
 
 
 class FALError(Exception):
     pass
-
-
-def load_registry():
-    reg = json.load(open(REGISTRY))
-    kinds = {k["name"].lower(): k["name"] for k in reg["nodeKinds"]}
-    predicates = {}
-    for r in reg["relationTypes"]:
-        predicates[r["name"].lower()] = r
-    return kinds, predicates
-
-
-def coerce(v):
-    """Light scalar coercion for attribute values."""
-    if v in ("true", "false"):
-        return v == "true"
-    if re.fullmatch(r"-?\d+", v):
-        return int(v)
-    if re.fullmatch(r"-?\d*\.\d+", v):
-        return float(v)
-    return v
 
 
 def split_top_level(s, sep=","):
@@ -137,6 +116,7 @@ def parse(text):
 
 def compile_source(text):
     kinds, predicates = load_registry()
+    reserved = reserved_fields()
     header, decls = parse(text)
 
     # First pass: build nodes and a name -> node index.
@@ -189,7 +169,7 @@ def compile_source(text):
                 node["tags"] = [t.strip() for t in value.split(",") if t.strip()]
             elif key == "scope":
                 node["scope"] = resolve(value, lineno)["id"]
-            elif key in RESERVED:
+            elif key in reserved:
                 node[key] = value
             else:
                 attrs[key] = coerce(value)
@@ -252,11 +232,11 @@ def validate_graph(graph):
         return builtin_check(graph), "builtin (zero-dependency)"
     res = []
     for f in glob.glob(os.path.join(ROOT, "schema", "**", "*.json"), recursive=True):
-        d = json.load(open(f))
+        d = read_json(f)
         if "$id" in d:
             res.append((d["$id"], Resource.from_contents(d)))
     reg = Registry().with_resources(res)
-    schema = json.load(open(os.path.join(ROOT, "schema", "meta", "graph.schema.json")))
+    schema = read_json(os.path.join(ROOT, "schema", "meta", "graph.schema.json"))
     errs = [f"{list(e.path)} {e.message}"
             for e in Draft202012Validator(schema, registry=reg).iter_errors(graph)]
     return errs, "jsonschema"
@@ -271,14 +251,16 @@ def main(argv=None):
     args = ap.parse_args(argv)
 
     try:
-        graph = compile_source(open(args.source).read())
+        with open(args.source) as fh:
+            graph = compile_source(fh.read())
     except FALError as e:
         print(f"afc: {e}", file=sys.stderr)
         return 2
 
     out = json.dumps(graph, indent=2)
     if args.out:
-        open(args.out, "w").write(out + "\n")
+        with open(args.out, "w") as fh:
+            fh.write(out + "\n")
     else:
         print(out)
 
