@@ -90,6 +90,16 @@ check("graph rebuilds exactly from its genesis event log (from empty)",
 errs, _ = afc.validate_graph(rebuilt)
 check("rebuilt graph validates", not errs)
 
+print("== vocabulary / SDK drift ==")
+reg = read("schema/registry/registry.json")
+reg_kinds = [k["name"] for k in reg["nodeKinds"]]
+reg_preds = [p["name"] for p in reg["relationTypes"]]
+check("registry ships 12 kinds / 22 predicates",
+      len(reg_kinds) == 12 and len(reg_preds) == 22)
+sdk_vocab = read("sdk/vocabulary.json")
+check("generated SDK vocabulary matches the registry (no drift)",
+      sdk_vocab["nodeKinds"] == reg_kinds and sdk_vocab["relationPredicates"] == reg_preds)
+
 print("== conformance (validate every example graph) ==")
 for ex in ("schema/examples/graph.example.json", "examples/research.graph.json",
            "examples/namespaced.graph.json"):

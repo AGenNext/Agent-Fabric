@@ -11,8 +11,14 @@ module mains the individual scripts use.
 python tools/fab.py compile EXAMPLE.af [--validate]   # == afc
 python tools/fab.py query   GRAPH.json "QUERY"        # == bql
 python tools/fab.py sim     BASE.json EVENTS.json     # == sim
+python tools/fab.py vocab   [--lang python|ts|go|json]  # print/export the vocabulary
 python tools/fab.py test                              # run tests/e2e.py
 ```
+
+`fab vocab` prints the shipped vocabulary (kinds + predicates) from the registry,
+or with `--lang` emits language bindings — the source for the generated
+[`sdk/`](../sdk/) (Python, TypeScript, Go, JSON). The e2e suite guards against
+drift between the SDKs and the registry.
 
 ## afc — Fabric Agent Language compiler
 

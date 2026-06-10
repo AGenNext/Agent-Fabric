@@ -7,6 +7,7 @@ mains, so `fab compile` == `afc`, `fab query` == `bql`, `fab sim` == `sim`.
     fab compile EXAMPLE.af [--validate] [-o out.json]   # author  (afc)
     fab query   GRAPH.json "QUERY" [--events ...]        # query   (bql)
     fab sim     BASE.json EVENTS.json [--explode] ...    # emulate (sim)
+    fab vocab                                            # print the shipped vocabulary
     fab test                                             # run the e2e suite
 
 Pure standard library; no install.
@@ -18,6 +19,94 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "tools"))
 
 USAGE = __doc__
+
+
+def _emit_python(kinds, preds, version):
+    return ('"""Agent-Fabric vocabulary — generated from the registry; do not edit."""\n'
+            f'REGISTRY_VERSION = "{version}"\n'
+            f"NODE_KINDS = {kinds!r}\n"
+            f"RELATION_PREDICATES = {preds!r}\n")
+
+
+def _emit_typescript(kinds, preds, version):
+    ku = " | ".join(f'"{k}"' for k in kinds)
+    pu = " | ".join(f'"{p}"' for p in preds)
+    arr = lambda xs: "[" + ", ".join(f'"{x}"' for x in xs) + "]"
+    return ("// Agent-Fabric vocabulary — generated from the registry; do not edit.\n"
+            f'export const REGISTRY_VERSION = "{version}";\n'
+            f"export type NodeKind = {ku};\n"
+            f"export type RelationPredicate = {pu};\n"
+            f"export const NODE_KINDS: NodeKind[] = {arr(kinds)};\n"
+            f"export const RELATION_PREDICATES: RelationPredicate[] = {arr(preds)};\n")
+
+
+def _emit_go(kinds, preds, version):
+    arr = lambda xs: "{" + ", ".join(f'"{x}"' for x in xs) + "}"
+    return ("// Agent-Fabric vocabulary — generated from the registry; DO NOT EDIT.\n"
+            "package fabric\n\n"
+            f'const RegistryVersion = "{version}"\n\n'
+            f"var NodeKinds = []string{arr(kinds)}\n\n"
+            f"var RelationPredicates = []string{arr(preds)}\n")
+
+
+def _emit_json(kinds, preds, version):
+    import json
+    return json.dumps({"registryVersion": version, "nodeKinds": kinds,
+                       "relationPredicates": preds}, indent=2) + "\n"
+
+
+_EMITTERS = {"python": _emit_python, "typescript": _emit_typescript,
+             "ts": _emit_typescript, "go": _emit_go, "json": _emit_json}
+
+
+def _vocab(argv):
+    """Print or export the vocabulary the product ships with — the registered
+    node kinds and relation predicates, the single source of truth.
+
+    fab vocab                      human-readable listing
+    fab vocab --lang python|ts|go|json [-o FILE]   generated language bindings
+    """
+    import fabriclib
+    lang = out = None
+    i = 0
+    while i < len(argv):
+        if argv[i] == "--lang":
+            lang = argv[i + 1]; i += 2
+        elif argv[i] in ("-o", "--out"):
+            out = argv[i + 1]; i += 2
+        else:
+            i += 1
+    reg = fabriclib.read_json(os.path.join(ROOT, "schema", "registry", "registry.json"))
+    version = reg.get("version", "?")
+    kinds = [k["name"] for k in reg["nodeKinds"]]
+    preds = [p["name"] for p in reg["relationTypes"]]
+
+    if lang:
+        emit = _EMITTERS.get(lang)
+        if not emit:
+            print(f"fab: unknown --lang {lang!r}; choose from {', '.join(sorted(_EMITTERS))}",
+                  file=sys.stderr)
+            return 2
+        text = emit(kinds, preds, version)
+        if out:
+            with open(out, "w") as fh:
+                fh.write(text)
+        else:
+            sys.stdout.write(text)
+        return 0
+
+    print(f"Agent-Fabric vocabulary (registry {version})\n")
+    print(f"NODE KINDS ({len(kinds)}):")
+    for k in reg["nodeKinds"]:
+        print(f"  {k['name']:<11} {k.get('description', '')}")
+    print(f"\nRELATION PREDICATES ({len(preds)}):")
+    for p in reg["relationTypes"]:
+        dom = ", ".join(p.get("domain") or ["any"])
+        rng = ", ".join(p.get("range") or ["any"])
+        flags = [f for f in ("symmetric", "transitive") if p.get(f)]
+        tail = f"  [{', '.join(flags)}]" if flags else ""
+        print(f"  {p['name']:<18} {dom} -> {rng}{tail}")
+    return 0
 
 
 def main(argv=None):
@@ -36,6 +125,8 @@ def main(argv=None):
     if cmd in ("sim", "emulate", "rebuild"):
         import sim
         return sim.main(rest)
+    if cmd in ("vocab", "vocabulary", "registry"):
+        return _vocab(rest)
     if cmd in ("test", "e2e"):
         import runpy
         try:
