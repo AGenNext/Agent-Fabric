@@ -43,7 +43,8 @@ The ecosystem graph should remain traceable, queryable, and versioned.
 
 The multi-model, real-time graph meta-model for autonomous agents is defined in:
 
-- [`spec/meta-model.md`](spec/meta-model.md) — the specification (concepts, layers, real-time/versioning rules, relation taxonomy).
+- **[`spec/SPECIFICATION.md`](spec/SPECIFICATION.md) — the complete specification** (principles, architecture, meta-model, storage/kernel, events, emulation/rebuild, languages, toolchain). Start here.
+- [`spec/meta-model.md`](spec/meta-model.md) · [`spec/dsl.md`](spec/dsl.md) · [`spec/bql.md`](spec/bql.md) · [`spec/simulation.md`](spec/simulation.md) — detailed companion specs.
 - [`schema/`](schema/) — machine-readable JSON Schema (draft 2020-12) + JSON-LD, plus the populated type registry and worked examples.
 
 It is **multi-model** (one heterogeneous graph over 12 node kinds and 22 relation types), **real-time** (the graph is the left-fold of an ordered `GraphEvent` stream, with watermarked snapshots), and a **meta-model** (node kinds and predicates are first-class, versioned data in the type registry).
