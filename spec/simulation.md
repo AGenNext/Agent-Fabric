@@ -43,10 +43,12 @@ python tools/bql.py schema/examples/graph.example.json "agent" \
 
 Events are applied in `sequence` order. Each event targets one node or edge:
 
-| `op` | Effect on the in-memory store |
+The store is just a key (`id`) → value map and the log is an append-only chain.
+
+| `op` | Effect on the keyed store |
 |---|---|
-| `upsert` | create the element, or merge the payload into the existing one (top-level fields replaced; `attributes` shallow-merged) |
-| `delete` | remove the element (tombstone) |
+| `upsert` | set the element by key, stored **as-is** — insert when the key is absent, overwrite when present (last-write-wins). No deep merge; the only "merge" is inserting a new key |
+| `delete` | remove the element by key (tombstone) |
 | `invalidate` | set the element's `validTo` (close valid-time) without removing it |
 
 The projection's `watermark` records the last applied `sequence`, its
