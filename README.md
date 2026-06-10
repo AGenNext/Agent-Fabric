@@ -41,62 +41,103 @@ The ecosystem graph should remain traceable, queryable, and versioned.
 
 ## Meta-Model
 
-The multi-model, real-time graph meta-model for autonomous agents is defined in:
+The multi-model, real-time graph meta-model for autonomous agents. It is
+**multi-model** (one heterogeneous graph over **12 node kinds** and **22 relation
+predicates**), **real-time** (the graph is the deterministic fold of an
+append-only `GraphEvent` chain), and a **meta-model** (kinds, predicates, and
+lifecycle states are first-class, versioned **registries**).
 
-- **[`spec/SPECIFICATION.md`](spec/SPECIFICATION.md) — the complete specification** (principles, architecture, meta-model, storage/kernel, events, emulation/rebuild, languages, toolchain). Start here.
-- [`spec/meta-model.md`](spec/meta-model.md) · [`spec/dsl.md`](spec/dsl.md) · [`spec/bql.md`](spec/bql.md) · [`spec/simulation.md`](spec/simulation.md) — detailed companion specs.
-- [`schema/`](schema/) — machine-readable JSON Schema (draft 2020-12) + JSON-LD, plus the populated type registry and worked examples.
+**Read the spec:** **[`spec/SPECIFICATION.md`](spec/SPECIFICATION.md)** is the
+complete book; [`meta-model`](spec/meta-model.md) · [`dsl`](spec/dsl.md) ·
+[`bql`](spec/bql.md) · [`simulation`](spec/simulation.md) ·
+[`quality`](spec/quality.md) are detailed companions.
+[`schema/`](schema/) holds the JSON Schema (draft 2020-12) + JSON-LD and the
+registries.
 
-It is **multi-model** (one heterogeneous graph over 12 node kinds and 22 relation types), **real-time** (the graph is the left-fold of an ordered `GraphEvent` stream, with watermarked snapshots), and a **meta-model** (node kinds and predicates are first-class, versioned data in the type registry).
+### Principles
 
-### Quickstart (60-second tour)
+Built on a few non-negotiables — **storage + calculation, nothing else**: data
+is stored as-is (raw JSON, keyed by `id`, an append-only chain), and every view
+is calculated on read. No ORM, no middleware, no compute service, no event bus
+(the idempotent keyed fold makes at-least-once/out-of-order delivery enough), no
+materialized subgraphs, single binary, zero install.
 
-No install — pure Python standard library (a stock interpreter, no packages, no services). One entry point, `tools/fab.py`, with a subcommand per stage. Author → query → emulate → rebuild:
+### Lifecycle: proposal → enforce → migrate → active
+
+Everything starts as a **proposal** (`state` defaults to `proposed`).
+**Correctness is enforced**, not optional — the compiler never emits an invalid
+graph and the kernel rejects bad events at ingestion. **Migration** is the gated
+promotion path: `fab migrate` validates (and optionally requires a minimum
+quality score), then promotes proposals to `active`.
+
+### Quickstart
+
+No install — pure Python standard library. One entry point, `tools/fab.py`:
 
 ```bash
-# 1. author: compile the human-writable .af model to a validated graph
+# author: compile the human-writable .af model (correctness is enforced)
 python tools/fab.py compile examples/research.af --validate
 
-# 2. query: traverse the graph (> is a hop, < is reverse)
+# query: traverse the graph (> is a hop, < is reverse)
 python tools/fab.py query examples/research.graph.json "agent:orchestrator-7 > delegates_to > agent"
 
-# 3. emulate: query the state AFTER a proposed event delta — no subgraph built
+# ego-view: each party is the centre of its own world
+python tools/fab.py query examples/research.graph.json --ego af:agent/researcher-3 --radius 2
+
+# emulate: query the state AFTER a proposed event delta — no subgraph built
 python tools/fab.py query schema/examples/graph.example.json "agent" \
   --events schema/examples/event-stream.example.json
 
-# 4. rebuild: reconstruct the whole model from its event log alone
+# rebuild: reconstruct the whole model from its event log alone
 python tools/fab.py sim examples/research.graph.json --explode -o /tmp/genesis.json
 echo '{"nodes":[],"edges":[]}' > /tmp/empty.json
 python tools/fab.py sim /tmp/empty.json /tmp/genesis.json -o /tmp/rebuilt.json  # == research.graph.json
 
-# verify everything end-to-end
+# grade: score model quality, not just correctness
+python tools/fab.py grade examples/research.graph.json
+
+# migrate: promote proposals -> active, gated on correctness
+python tools/fab.py migrate examples/research.graph.json --min-quality 60 -o active.json
+
+# verify everything end-to-end (32/32)
 python tools/fab.py test
 ```
 
-Each subcommand is also runnable as its own script (`tools/afc.py`, `tools/bql.py`, `tools/sim.py`).
+### Commands
 
-### Authoring (Fabric Agent Language)
+| Command | Stage | Does |
+|---|---|---|
+| `fab compile x.af` | author | FAL → schema-valid graph JSON (domain-namespaced, slugged) |
+| `fab query g.json "Q"` | query | indexed `>`/`<` traversal; `--ego N`; `--events EV` for emulated state |
+| `fab sim base ev` | emulate / rebuild | kernel overlay (no subgraph); `--at` time-travel; `--explode` genesis log |
+| `fab grade g.json` | quality | weighted rubric of verifiers → 0–100 + verdict |
+| `fab migrate g.json` | lifecycle | promote proposals → active, gated on correctness/quality |
+| `fab vocab [--lang …]` | vocabulary | print / export the registry vocabulary |
+| `fab test` | conformance | the 32-check e2e suite |
 
-For human-friendly authoring, [`spec/dsl.md`](spec/dsl.md) defines **FAL** — an indentation-style `.af` language that compiles to schema-valid graph JSON via [`tools/afc.py`](tools/afc.py):
+Each subcommand is also a standalone script under [`tools/`](tools/).
 
-```bash
-python tools/afc.py examples/research.af --validate
+### Ships with its vocabulary, in every language
+
+The [registries](schema/registry/) (types + states) are the single source of
+truth; [`sdk/`](sdk/) carries generated bindings for **Python, TypeScript, Go,
+and JSON**, drift-guarded by the e2e suite. Regenerate with
+`fab vocab --lang …`.
+
+### Correctness vs. quality
+
+Validation proves a model is *correct*; `fab grade` asks whether it is *good*
+(after the FrontierCode shift from correctness to quality). The valid research
+model scores ~64/100 — "not ready" — flagging agents without identity/runtime,
+ungoverned resources, and missing provenance. See [`spec/quality.md`](spec/quality.md).
+
+### Layout
+
 ```
-
-### Querying (Blockquote Query Language)
-
-[`spec/bql.md`](spec/bql.md) defines **BQL** — a path-traversal query language that uses `>` as the hop operator (`<` for reverse), evaluated by [`tools/bql.py`](tools/bql.py):
-
-```bash
-python tools/bql.py examples/research.graph.json \
-  "agent:orchestrator-7 > delegates_to > agent > runs_on > runtime"
-```
-
-### Simulating (rehearse before real)
-
-[`spec/simulation.md`](spec/simulation.md) describes **`sim`** — fold a proposed `GraphEvent` stream onto a base graph to project the outcome without committing it, via [`tools/sim.py`](tools/sim.py):
-
-```bash
-python tools/sim.py schema/examples/graph.example.json \
-                    schema/examples/event-stream.example.json -o projected.json
+spec/     SPECIFICATION.md (the book) + meta-model, dsl, bql, simulation, quality
+schema/   meta schemas · 12 node kinds · registries (types, states) · JSON-LD · examples
+tools/    fab · afc · bql · sim · kernel · grade · migrate · fabriclib
+sdk/      generated vocabulary: python · typescript · go · json
+examples/ .af sources + compiled graphs (research, namespaced, comms)
+tests/    e2e.py — 32 conformance checks
 ```
