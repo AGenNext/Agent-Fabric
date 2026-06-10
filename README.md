@@ -64,3 +64,12 @@ python tools/afc.py examples/research.af --validate
 python tools/bql.py examples/research.graph.json \
   "agent:orchestrator-7 > delegates_to > agent > runs_on > runtime"
 ```
+
+### Simulating (rehearse before real)
+
+[`spec/simulation.md`](spec/simulation.md) describes **`sim`** — fold a proposed `GraphEvent` stream onto a base graph to project the outcome without committing it, via [`tools/sim.py`](tools/sim.py):
+
+```bash
+python tools/sim.py schema/examples/graph.example.json \
+                    schema/examples/event-stream.example.json -o projected.json
+```

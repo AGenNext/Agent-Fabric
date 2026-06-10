@@ -47,3 +47,18 @@ python tools/bql.py examples/research.graph.json "agent" --json
 ```
 
 Exit codes: `0` ok · `2` query syntax error.
+
+## sim — event-fold simulator
+
+`sim.py` folds a `GraphEvent` stream onto a base graph to project ("rehearse")
+the resulting state without committing anything. See
+[`../spec/simulation.md`](../spec/simulation.md).
+
+```bash
+# project the outcome of an event stream (nothing is mutated except -o output)
+python tools/sim.py schema/examples/graph.example.json \
+                    schema/examples/event-stream.example.json -o projected.json
+
+# time-travel: fold only events up to sequence 44
+python tools/sim.py base.json events.json --at 44 --summary
+```
