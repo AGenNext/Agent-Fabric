@@ -96,9 +96,14 @@ reg_kinds = [k["name"] for k in reg["nodeKinds"]]
 reg_preds = [p["name"] for p in reg["relationTypes"]]
 check("registry ships 12 kinds / 22 predicates",
       len(reg_kinds) == 12 and len(reg_preds) == 22)
+state_reg = [s["name"] for s in read("schema/registry/states.json")["states"]]
+schema_states = read("schema/meta/state.schema.json")["enum"]
+check("state registry matches the state schema", state_reg == schema_states)
 sdk_vocab = read("sdk/vocabulary.json")
 check("generated SDK vocabulary matches the registry (no drift)",
-      sdk_vocab["nodeKinds"] == reg_kinds and sdk_vocab["relationPredicates"] == reg_preds)
+      sdk_vocab["nodeKinds"] == reg_kinds
+      and sdk_vocab["relationPredicates"] == reg_preds
+      and sdk_vocab["lifecycleStates"] == state_reg)
 
 print("== conformance (validate every example graph) ==")
 for ex in ("schema/examples/graph.example.json", "examples/research.graph.json",

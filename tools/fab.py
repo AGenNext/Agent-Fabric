@@ -21,38 +21,42 @@ sys.path.insert(0, os.path.join(ROOT, "tools"))
 USAGE = __doc__
 
 
-def _emit_python(kinds, preds, version):
+def _emit_python(kinds, preds, states, version):
     return ('"""Agent-Fabric vocabulary — generated from the registry; do not edit."""\n'
             f'REGISTRY_VERSION = "{version}"\n'
             f"NODE_KINDS = {kinds!r}\n"
-            f"RELATION_PREDICATES = {preds!r}\n")
+            f"RELATION_PREDICATES = {preds!r}\n"
+            f"LIFECYCLE_STATES = {states!r}\n")
 
 
-def _emit_typescript(kinds, preds, version):
-    ku = " | ".join(f'"{k}"' for k in kinds)
-    pu = " | ".join(f'"{p}"' for p in preds)
+def _emit_typescript(kinds, preds, states, version):
+    union = lambda xs: " | ".join(f'"{x}"' for x in xs)
     arr = lambda xs: "[" + ", ".join(f'"{x}"' for x in xs) + "]"
     return ("// Agent-Fabric vocabulary — generated from the registry; do not edit.\n"
             f'export const REGISTRY_VERSION = "{version}";\n'
-            f"export type NodeKind = {ku};\n"
-            f"export type RelationPredicate = {pu};\n"
+            f"export type NodeKind = {union(kinds)};\n"
+            f"export type RelationPredicate = {union(preds)};\n"
+            f"export type LifecycleState = {union(states)};\n"
             f"export const NODE_KINDS: NodeKind[] = {arr(kinds)};\n"
-            f"export const RELATION_PREDICATES: RelationPredicate[] = {arr(preds)};\n")
+            f"export const RELATION_PREDICATES: RelationPredicate[] = {arr(preds)};\n"
+            f"export const LIFECYCLE_STATES: LifecycleState[] = {arr(states)};\n")
 
 
-def _emit_go(kinds, preds, version):
+def _emit_go(kinds, preds, states, version):
     arr = lambda xs: "{" + ", ".join(f'"{x}"' for x in xs) + "}"
     return ("// Agent-Fabric vocabulary — generated from the registry; DO NOT EDIT.\n"
             "package fabric\n\n"
             f'const RegistryVersion = "{version}"\n\n'
             f"var NodeKinds = []string{arr(kinds)}\n\n"
-            f"var RelationPredicates = []string{arr(preds)}\n")
+            f"var RelationPredicates = []string{arr(preds)}\n\n"
+            f"var LifecycleStates = []string{arr(states)}\n")
 
 
-def _emit_json(kinds, preds, version):
+def _emit_json(kinds, preds, states, version):
     import json
     return json.dumps({"registryVersion": version, "nodeKinds": kinds,
-                       "relationPredicates": preds}, indent=2) + "\n"
+                       "relationPredicates": preds, "lifecycleStates": states},
+                      indent=2) + "\n"
 
 
 _EMITTERS = {"python": _emit_python, "typescript": _emit_typescript,
@@ -77,9 +81,11 @@ def _vocab(argv):
         else:
             i += 1
     reg = fabriclib.read_json(os.path.join(ROOT, "schema", "registry", "registry.json"))
+    state_reg = fabriclib.read_json(os.path.join(ROOT, "schema", "registry", "states.json"))
     version = reg.get("version", "?")
     kinds = [k["name"] for k in reg["nodeKinds"]]
     preds = [p["name"] for p in reg["relationTypes"]]
+    states = [s["name"] for s in state_reg["states"]]
 
     if lang:
         emit = _EMITTERS.get(lang)
@@ -87,7 +93,7 @@ def _vocab(argv):
             print(f"fab: unknown --lang {lang!r}; choose from {', '.join(sorted(_EMITTERS))}",
                   file=sys.stderr)
             return 2
-        text = emit(kinds, preds, version)
+        text = emit(kinds, preds, states, version)
         if out:
             with open(out, "w") as fh:
                 fh.write(text)
@@ -106,6 +112,9 @@ def _vocab(argv):
         flags = [f for f in ("symmetric", "transitive") if p.get(f)]
         tail = f"  [{', '.join(flags)}]" if flags else ""
         print(f"  {p['name']:<18} {dom} -> {rng}{tail}")
+    print(f"\nLIFECYCLE STATES ({len(states)}):")
+    for s in state_reg["states"]:
+        print(f"  {s['name']:<11} {s.get('description', '')}")
     return 0
 
 

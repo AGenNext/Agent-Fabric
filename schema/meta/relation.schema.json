@@ -44,9 +44,7 @@
       "additionalProperties": true
     },
     "state": {
-      "type": "string",
-      "enum": ["proposed", "active", "degraded", "suspended", "retired", "deleted"],
-      "default": "active"
+      "$ref": "https://schema.agennext.dev/agent-fabric/meta/state.schema.json"
     },
     "scope": {
       "$ref": "https://schema.agennext.dev/agent-fabric/meta/entity.schema.json#/$defs/iri",

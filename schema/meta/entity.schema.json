@@ -60,10 +60,8 @@
       "description": "Free-text description."
     },
     "state": {
-      "type": "string",
-      "description": "Lifecycle state of the entity.",
-      "enum": ["proposed", "active", "degraded", "suspended", "retired", "deleted"],
-      "default": "active"
+      "$ref": "https://schema.agennext.dev/agent-fabric/meta/state.schema.json",
+      "description": "Lifecycle state of the entity (from the state registry)."
     },
     "tags": {
       "type": "array",

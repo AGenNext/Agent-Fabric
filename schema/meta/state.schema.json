@@ -1,0 +1,9 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schema.agennext.dev/agent-fabric/meta/state.schema.json",
+  "title": "LifecycleState",
+  "description": "The lifecycle state vocabulary shared by entities and relations. Single source of truth, referenced wherever a state appears and mirrored in schema/registry/states.json.",
+  "type": "string",
+  "enum": ["proposed", "active", "degraded", "suspended", "retired", "deleted"],
+  "default": "active"
+}
