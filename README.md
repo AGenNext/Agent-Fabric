@@ -48,6 +48,32 @@ The multi-model, real-time graph meta-model for autonomous agents is defined in:
 
 It is **multi-model** (one heterogeneous graph over 11 node kinds and 21 relation types), **real-time** (the graph is the left-fold of an ordered `GraphEvent` stream, with watermarked snapshots), and a **meta-model** (node kinds and predicates are first-class, versioned data in the type registry).
 
+### Quickstart (60-second tour)
+
+No install — pure Python standard library (a stock interpreter, no packages, no services). One entry point, `tools/fab.py`, with a subcommand per stage. Author → query → emulate → rebuild:
+
+```bash
+# 1. author: compile the human-writable .af model to a validated graph
+python tools/fab.py compile examples/research.af --validate
+
+# 2. query: traverse the graph (> is a hop, < is reverse)
+python tools/fab.py query examples/research.graph.json "agent:orchestrator-7 > delegates_to > agent"
+
+# 3. emulate: query the state AFTER a proposed event delta — no subgraph built
+python tools/fab.py query schema/examples/graph.example.json "agent" \
+  --events schema/examples/event-stream.example.json
+
+# 4. rebuild: reconstruct the whole model from its event log alone
+python tools/fab.py sim examples/research.graph.json --explode -o /tmp/genesis.json
+echo '{"nodes":[],"edges":[]}' > /tmp/empty.json
+python tools/fab.py sim /tmp/empty.json /tmp/genesis.json -o /tmp/rebuilt.json  # == research.graph.json
+
+# verify everything end-to-end
+python tools/fab.py test
+```
+
+Each subcommand is also runnable as its own script (`tools/afc.py`, `tools/bql.py`, `tools/sim.py`).
+
 ### Authoring (Fabric Agent Language)
 
 For human-friendly authoring, [`spec/dsl.md`](spec/dsl.md) defines **FAL** — an indentation-style `.af` language that compiles to schema-valid graph JSON via [`tools/afc.py`](tools/afc.py):

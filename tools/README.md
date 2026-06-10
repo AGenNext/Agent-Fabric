@@ -1,5 +1,19 @@
 # tools/
 
+Pure standard library — no install, no packages, no services.
+
+## fab — single entry point
+
+`fab.py` is one command with a subcommand per stage; it dispatches to the same
+module mains the individual scripts use.
+
+```bash
+python tools/fab.py compile EXAMPLE.af [--validate]   # == afc
+python tools/fab.py query   GRAPH.json "QUERY"        # == bql
+python tools/fab.py sim     BASE.json EVENTS.json     # == sim
+python tools/fab.py test                              # run tests/e2e.py
+```
+
 ## afc — Fabric Agent Language compiler
 
 `afc.py` compiles an indentation-style `.af` source (see
