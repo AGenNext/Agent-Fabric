@@ -8,6 +8,7 @@ mains, so `fab compile` == `afc`, `fab query` == `bql`, `fab sim` == `sim`.
     fab query   GRAPH.json "QUERY" [--events ...]        # query   (bql)
     fab sim     BASE.json EVENTS.json [--explode] ...    # emulate (sim)
     fab vocab                                            # print the shipped vocabulary
+    fab grade   GRAPH.json [--json]                      # score model quality
     fab test                                             # run the e2e suite
 
 Pure standard library; no install.
@@ -136,6 +137,9 @@ def main(argv=None):
         return sim.main(rest)
     if cmd in ("vocab", "vocabulary", "registry"):
         return _vocab(rest)
+    if cmd in ("grade", "quality", "lint"):
+        import grade
+        return grade.main(rest)
     if cmd in ("test", "e2e"):
         import runpy
         try:

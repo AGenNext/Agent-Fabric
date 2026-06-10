@@ -105,6 +105,17 @@ check("generated SDK vocabulary matches the registry (no drift)",
       and sdk_vocab["relationPredicates"] == reg_preds
       and sdk_vocab["lifecycleStates"] == state_reg)
 
+print("== quality grading (correctness vs quality) ==")
+import grade as grade_mod   # noqa: E402
+gscore, gcrit = grade_mod.grade(graph)
+corr = next(c for c in gcrit if c["name"] == "correctness")
+check("a valid model scores full correctness", corr["score"] == 1.0)
+check("quality is graded separately from correctness (0 < score < 100)",
+      0 < gscore < 100)
+check("grader flags the orchestrator's missing identity",
+      any("orchestrator-7 has no identity" in f
+          for c in gcrit for f in c["findings"]))
+
 print("== conformance (validate every example graph) ==")
 for ex in ("schema/examples/graph.example.json", "examples/research.graph.json",
            "examples/namespaced.graph.json"):

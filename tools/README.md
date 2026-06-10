@@ -12,6 +12,7 @@ python tools/fab.py compile EXAMPLE.af [--validate]   # == afc
 python tools/fab.py query   GRAPH.json "QUERY"        # == bql
 python tools/fab.py sim     BASE.json EVENTS.json     # == sim
 python tools/fab.py vocab   [--lang python|ts|go|json]  # print/export the vocabulary
+python tools/fab.py grade   GRAPH.json [--json]       # score model quality (not just correctness)
 python tools/fab.py test                              # run tests/e2e.py
 ```
 
