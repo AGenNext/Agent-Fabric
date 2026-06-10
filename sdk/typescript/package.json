@@ -1,0 +1,22 @@
+{
+  "name": "@agennext/agent-fabric",
+  "version": "1.0.0",
+  "description": "TypeScript + NestJS SDK for the Agent-Fabric meta-model: types, vocabulary, kernel, query, and a NestJS module.",
+  "license": "UNLICENSED",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": ["dist", "*.ts"],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "peerDependencies": {
+    "@nestjs/common": "^10 || ^11"
+  },
+  "peerDependenciesMeta": {
+    "@nestjs/common": { "optional": true }
+  },
+  "devDependencies": {
+    "typescript": "^5"
+  }
+}

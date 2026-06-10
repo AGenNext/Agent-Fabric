@@ -9,9 +9,9 @@ none can drift.
 
 | Language | File | Exposes |
 |---|---|---|
-| Python | [`python/agent_fabric/vocabulary.py`](python/agent_fabric/vocabulary.py) | `NODE_KINDS`, `RELATION_PREDICATES`, `REGISTRY_VERSION` |
-| TypeScript | [`typescript/vocabulary.ts`](typescript/vocabulary.ts) | `NodeKind`/`RelationPredicate` union types + arrays |
-| Go | [`go/vocabulary.go`](go/vocabulary.go) | `NodeKinds`, `RelationPredicates`, `RegistryVersion` |
+| Python | [`python/agent_fabric/vocabulary.py`](python/agent_fabric/vocabulary.py) | `NODE_KINDS`, `RELATION_PREDICATES`, `LIFECYCLE_STATES`, `REGISTRY_VERSION` |
+| TypeScript / NestJS | [`typescript/`](typescript/) | full SDK — vocabulary, types, `GraphKernel`, query/ego, and a NestJS module/service (see [its README](typescript/README.md)) |
+| Go | [`go/vocabulary.go`](go/vocabulary.go) | `NodeKinds`, `RelationPredicates`, `LifecycleStates`, `RegistryVersion` |
 | JSON | [`vocabulary.json`](vocabulary.json) | language-neutral list for any other toolchain |
 
 ## Regenerate
