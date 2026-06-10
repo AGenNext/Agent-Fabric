@@ -156,6 +156,9 @@ def main(argv=None):
     ap.add_argument("graph", help="compiled graph JSON file")
     ap.add_argument("query", nargs="?", help="BQL query string")
     ap.add_argument("-f", "--file", help="read the query from a file")
+    ap.add_argument("--events", help="overlay this GraphEvent stream and query the "
+                                     "emulated state (no subgraph materialized)")
+    ap.add_argument("--at", type=int, help="with --events: overlay only up to sequence AT")
     ap.add_argument("--json", action="store_true", help="emit full node objects as JSON")
     args = ap.parse_args(argv)
 
@@ -168,6 +171,12 @@ def main(argv=None):
         ap.error("provide a query string or -f FILE")
 
     graph = read_json(args.graph)
+    if args.events:
+        from kernel import GraphKernel
+        events = read_json(args.events)
+        if isinstance(events, dict):
+            events = events.get("events", [events])
+        graph, _ = GraphKernel(graph, events, until=args.at).view()
     try:
         results = evaluate(graph, q)
     except ValueError as e:

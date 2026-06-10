@@ -44,9 +44,20 @@ python tools/bql.py examples/research.graph.json \
 
 # full node objects
 python tools/bql.py examples/research.graph.json "agent" --json
+
+# query EMULATED state: overlay an event delta through the kernel, no subgraph built
+python tools/bql.py schema/examples/graph.example.json "agent" \
+  --events schema/examples/event-stream.example.json
 ```
 
 Exit codes: `0` ok · `2` query syntax error.
+
+## kernel — emulation overlay (`kernel.py`)
+
+`GraphKernel(base, events, until)` overlays an event delta on a base graph and
+presents the emulated state on read — storage + calculation, no materialized
+subgraph. Shared by `sim` and `bql --events`. Not a CLI; imported by the tools.
+See [`../spec/simulation.md`](../spec/simulation.md).
 
 ## sim — event-fold simulator
 

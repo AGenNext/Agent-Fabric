@@ -14,18 +14,29 @@ Status: Draft · Version 1.0.0
 
 ## 1. Idea
 
-Authoring (`afc`) builds a graph; querying (`bql`) reads it; **simulation
-(`sim`) folds events onto it to preview a future or hypothetical state.** The
-result is a normal `Graph`, so it can be queried with `bql`, validated, or
-diffed against the base — all before any of it is made real.
+The model is just **storage + calculation**: the stored graph plus an event
+delta, and a thin overlay that computes the emulated state. There is no ORM, no
+middleware, no separate compute service — emulation is modelled by the
+*kernel*, not by materializing a subgraph.
+
+[`tools/kernel.py`](../tools/kernel.py) is that kernel: `GraphKernel(base,
+events, until)` overlays an ordered `GraphEvent` delta on a base graph and
+presents the emulated state on read. Both tools read through it:
+
+- **`sim`** prints/saves the projected `Graph` (storyboard the outcome).
+- **`bql --events`** queries the emulated state *directly* — no projected
+  subgraph is built or stored.
 
 ```bash
-# Project the outcome of an event stream onto a base graph (nothing is committed)
+# Project the outcome of an event stream (nothing committed except -o)
 python tools/sim.py schema/examples/graph.example.json \
                     schema/examples/event-stream.example.json -o projected.json
 
-# Then rehearse a query against the projection
-python tools/bql.py projected.json "agent"
+# Or query the emulated state through the kernel, with no subgraph materialized
+python tools/bql.py schema/examples/graph.example.json "agent" \
+                    --events schema/examples/event-stream.example.json
+python tools/bql.py schema/examples/graph.example.json "agent" \
+                    --events schema/examples/event-stream.example.json --at 44
 ```
 
 ## 2. Fold semantics
