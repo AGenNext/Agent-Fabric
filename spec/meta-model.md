@@ -108,11 +108,11 @@ whose watermark is *n* — deterministically.
 [`type-registry.schema.json`](../schema/meta/type-registry.schema.json). It is
 the authoritative, versioned list of what may exist in the graph.
 
-### 4.1 Node kinds (11)
+### 4.1 Node kinds (12)
 
 `Agent`, `Human`, `Team`, `Tool`, `Skill`, `Runtime`, `Resource`, `Policy`,
-`Trace`, `Identity`, `Workspace`. Each entry links to the JSON Schema that
-validates that kind's instances.
+`Trace`, `Identity`, `Workspace`, `Channel`. Each entry links to the JSON Schema
+that validates that kind's instances.
 
 ### 4.2 Relation types (predicates)
 
@@ -135,8 +135,9 @@ kinds), `cardinality`, and optional `symmetric` / `transitive` / `inverseOf`.
 | `ACCESSES` | Agent → Resource | access edge |
 | `TRUSTS` | Agent, Identity, Human → same | trust graph |
 | `DELEGATES_TO` | Agent, Human → Agent | delegation |
-| `COMMUNICATES_WITH` | Agent, Human ↔ same | symmetric interaction |
+| `COMMUNICATES_WITH` | Agent, Human, Team ↔ same | symmetric, any parties |
 | `COLLABORATES_WITH` | Team ↔ Team | symmetric |
+| `PARTICIPATES_IN` | Agent, Human, Team → Channel | one node connecting any parties |
 | `PRODUCED` | Agent, Team → Trace | evidence production |
 | `EVIDENCED_BY` | any → Trace | assertion ↔ evidence |
 | `DERIVED_FROM` | any → any | inference lineage, transitive |

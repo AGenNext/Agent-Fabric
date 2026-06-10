@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schema.agennext.dev/agent-fabric/nodes/channel.schema.json",
+  "title": "Channel",
+  "description": "A communication channel: one node through which any parties (agents, humans, teams) interact. Parties PARTICIPATE_IN a channel, giving many-to-many communication mediated by a single node rather than pairwise edges.",
+  "allOf": [{ "$ref": "https://schema.agennext.dev/agent-fabric/meta/entity.schema.json" }],
+  "properties": {
+    "kind": { "const": "Channel" },
+    "attributes": {
+      "type": "object",
+      "properties": {
+        "medium": { "type": "string", "enum": ["chat", "event-bus", "rpc", "email", "topic"] },
+        "topic": { "type": "string" },
+        "visibility": { "type": "string", "enum": ["private", "team", "public"] }
+      },
+      "additionalProperties": true
+    }
+  },
+  "required": ["kind"]
+}

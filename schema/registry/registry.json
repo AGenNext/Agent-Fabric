@@ -14,7 +14,8 @@
     { "name": "Policy", "schema": "https://schema.agennext.dev/agent-fabric/nodes/policy.schema.json", "description": "Governance rule." },
     { "name": "Trace", "schema": "https://schema.agennext.dev/agent-fabric/nodes/trace.schema.json", "description": "Execution evidence pointer." },
     { "name": "Identity", "schema": "https://schema.agennext.dev/agent-fabric/nodes/identity.schema.json", "description": "Credentialed principal." },
-    { "name": "Workspace", "schema": "https://schema.agennext.dev/agent-fabric/nodes/workspace.schema.json", "description": "Bounded context / partition." }
+    { "name": "Workspace", "schema": "https://schema.agennext.dev/agent-fabric/nodes/workspace.schema.json", "description": "Bounded context / partition." },
+    { "name": "Channel", "schema": "https://schema.agennext.dev/agent-fabric/nodes/channel.schema.json", "description": "Communication channel mediating any parties." }
   ],
   "relationTypes": [
     { "name": "MEMBER_OF", "description": "Agent/Human is a member of a Team.", "domain": ["Agent", "Human"], "range": ["Team"], "cardinality": "many-to-many" },
@@ -33,8 +34,9 @@
     { "name": "ACCESSES", "description": "Agent accesses a Resource.", "domain": ["Agent"], "range": ["Resource"], "cardinality": "many-to-many" },
     { "name": "TRUSTS", "description": "Trust edge between agents/identities.", "domain": ["Agent", "Identity", "Human"], "range": ["Agent", "Identity", "Human"], "cardinality": "many-to-many" },
     { "name": "DELEGATES_TO", "description": "Agent delegates a task/authority to another agent.", "domain": ["Agent", "Human"], "range": ["Agent"], "cardinality": "many-to-many" },
-    { "name": "COMMUNICATES_WITH", "description": "Observed interaction channel between agents.", "domain": ["Agent", "Human"], "range": ["Agent", "Human"], "symmetric": true, "cardinality": "many-to-many" },
+    { "name": "COMMUNICATES_WITH", "description": "Direct interaction between any two parties.", "domain": ["Agent", "Human", "Team"], "range": ["Agent", "Human", "Team"], "symmetric": true, "cardinality": "many-to-many" },
     { "name": "COLLABORATES_WITH", "description": "Team-to-team collaboration.", "domain": ["Team"], "range": ["Team"], "symmetric": true, "cardinality": "many-to-many" },
+    { "name": "PARTICIPATES_IN", "description": "A party participates in a communication Channel — one node connecting any parties.", "domain": ["Agent", "Human", "Team"], "range": ["Channel"], "cardinality": "many-to-many" },
     { "name": "PRODUCED", "description": "Agent produced a Trace.", "domain": ["Agent", "Team"], "range": ["Trace"], "cardinality": "one-to-many" },
     { "name": "EVIDENCED_BY", "description": "An assertion is evidenced by a Trace.", "domain": [], "range": ["Trace"], "cardinality": "many-to-many" },
     { "name": "DERIVED_FROM", "description": "Entity/relation derived/inferred from another.", "domain": [], "range": [], "transitive": true, "cardinality": "many-to-many" }

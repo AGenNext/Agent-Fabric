@@ -15,7 +15,7 @@ schema/
 │   ├── graph.schema.json         materialized snapshot + watermark
 │   ├── event.schema.json         GraphEvent — real-time change unit
 │   └── type-registry.schema.json the meta-model (schema of schemas)
-├── nodes/                      M1 concrete node kinds (11)
+├── nodes/                      M1 concrete node kinds (12)
 │   ├── agent.schema.json   human.schema.json   team.schema.json
 │   ├── tool.schema.json    skill.schema.json   runtime.schema.json
 │   ├── resource.schema.json policy.schema.json trace.schema.json

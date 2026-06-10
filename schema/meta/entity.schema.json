@@ -48,7 +48,7 @@
       "description": "Node kind. Must be a kind registered in the type registry.",
       "enum": [
         "Agent", "Human", "Team", "Tool", "Skill", "Runtime",
-        "Resource", "Policy", "Trace", "Identity", "Workspace"
+        "Resource", "Policy", "Trace", "Identity", "Workspace", "Channel"
       ]
     },
     "label": {

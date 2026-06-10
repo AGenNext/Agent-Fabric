@@ -14,6 +14,7 @@
     { "$ref": "https://schema.agennext.dev/agent-fabric/nodes/policy.schema.json" },
     { "$ref": "https://schema.agennext.dev/agent-fabric/nodes/trace.schema.json" },
     { "$ref": "https://schema.agennext.dev/agent-fabric/nodes/identity.schema.json" },
-    { "$ref": "https://schema.agennext.dev/agent-fabric/nodes/workspace.schema.json" }
+    { "$ref": "https://schema.agennext.dev/agent-fabric/nodes/workspace.schema.json" },
+    { "$ref": "https://schema.agennext.dev/agent-fabric/nodes/channel.schema.json" }
   ]
 }
