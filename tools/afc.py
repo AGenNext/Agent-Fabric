@@ -45,6 +45,11 @@ class FALError(Exception):
     pass
 
 
+def slug(name):
+    """Collapse internal whitespace to single hyphens so names form valid ids."""
+    return re.sub(r"\s+", "-", name.strip())
+
+
 def split_top_level(s, sep=","):
     """Split on `sep` only outside parentheses."""
     out, depth, cur = [], 0, ""
@@ -64,15 +69,23 @@ def split_top_level(s, sep=","):
 
 
 def parse_targets(value):
-    """'a, b (weight=2, k=v)' -> [('a', {}), ('b', {'weight':2,'k':'v'})]"""
+    """'a, b (weight=2, k=v)' -> [('a', {}), ('b', {'weight':2,'k':'v'})]
+
+    A target name may contain spaces (collapsed to a slug on resolution); the
+    optional trailing parenthesised group holds k=v modifiers.
+    """
     targets = []
     for token in split_top_level(value):
-        m = re.match(r"^([A-Za-z][A-Za-z0-9._-]*)\s*(?:\((.*)\))?$", token)
-        if not m:
+        if "(" in token:
+            name, rest = token.split("(", 1)
+            mods = rest.rsplit(")", 1)[0]
+        else:
+            name, mods = token, ""
+        name = name.strip()
+        if not name:
             raise FALError(f"invalid relation target: {token!r}")
-        name, mods = m.group(1), m.group(2)
         modmap = {}
-        if mods:
+        if mods.strip():
             for part in split_top_level(mods):
                 if "=" not in part:
                     raise FALError(f"invalid modifier {part!r} (expected k=v)")
@@ -99,7 +112,7 @@ def parse(text):
             parts = body.split(None, 1)
             if len(parts) != 2:
                 raise FALError(f"line {lineno}: expected '<kind> <name>', got {body!r}")
-            kind, name = parts[0], parts[1].strip()
+            kind, name = parts[0], slug(parts[1])
             if not NAME_RE.match(name):
                 raise FALError(f"line {lineno}: invalid node name {name!r}")
             cur = {"kind": kind, "name": name, "props": [], "lineno": lineno}
@@ -119,6 +132,10 @@ def compile_source(text):
     reserved = reserved_fields()
     header, decls = parse(text)
 
+    # The domain (if given) is the identifier namespace: af:<domain>/<kind>/<name>.
+    domain = slug(header["domain"]) if header.get("domain") else None
+    prefix = f"af:{domain}/" if domain else "af:"
+
     # First pass: build nodes and a name -> node index.
     by_name, nodes = {}, []
     for d in decls:
@@ -127,11 +144,12 @@ def compile_source(text):
             raise FALError(f"line {d['lineno']}: unknown node kind {d['kind']!r}")
         if d["name"] in by_name:
             raise FALError(f"line {d['lineno']}: duplicate node name {d['name']!r}")
-        node = {"id": f"af:{kind.lower()}/{d['name']}", "kind": kind}
+        node = {"id": f"{prefix}{kind.lower()}/{d['name']}", "kind": kind}
         by_name[d["name"]] = node
         nodes.append((node, d))
 
     def resolve(name, lineno):
+        name = slug(name)
         if name not in by_name:
             raise FALError(f"line {lineno}: reference to undeclared node {name!r}")
         return by_name[name]

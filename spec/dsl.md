@@ -54,6 +54,7 @@ python tools/afc.py examples/research.af --validate -o out.json
 | Directive | Effect |
 |---|---|
 | `@id <slug>` | Sets the graph id to `af:graph/<slug>` (default `compiled`). |
+| `@domain <ns>` | Sets the **identifier namespace**: node ids become `af:<ns>/<kind>/<name>` instead of `af:<kind>/<name>`. The domain *is* the namespace. |
 | `@tenant <name>` | Sets `Graph.tenant`. |
 | `@asOf <iso-8601>` | Sets the snapshot watermark `asOf` (default epoch). |
 | `@scope <workspace>` | Sets the graph-level `scope` to a declared workspace. |
@@ -69,8 +70,11 @@ python tools/afc.py examples/research.af --validate -o out.json
 - `<kind>` is one of the 11 registered kinds (case-insensitive): `agent`,
   `human`, `team`, `tool`, `skill`, `runtime`, `resource`, `policy`, `trace`,
   `identity`, `workspace`.
-- `<name>` is a unique identifier matching `[A-Za-z][A-Za-z0-9._-]*`. It becomes
-  the node id `af:<kind>/<name>` and is how other declarations refer to it.
+- `<name>` is a unique identifier. Internal whitespace is collapsed to hyphens
+  (so `billing platform` becomes the slug `billing-platform`); after slugging it
+  must match `[A-Za-z][A-Za-z0-9._-]*`. The name becomes the node id
+  `af:<kind>/<name>` (or `af:<domain>/<kind>/<name>` under `@domain`) and is how
+  other declarations refer to it — references are slugged the same way.
 
 ### Property resolution
 
