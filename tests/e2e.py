@@ -17,7 +17,7 @@ sys.path.insert(0, os.path.join(ROOT, "tools"))
 
 import afc                       # noqa: E402
 import bql                       # noqa: E402
-from kernel import GraphKernel   # noqa: E402
+from kernel import GraphKernel, explode   # noqa: E402
 
 checks = []
 
@@ -76,6 +76,14 @@ check("time-travel @44 keeps the node",
       "af:agent/researcher-3" in {n["id"] for n in proj44["nodes"]})
 check("bql over emulated state (no subgraph materialized)",
       q(proj, "agent") == ["af:agent/orchestrator-7"])
+
+print("== rebuild / sustainability ==")
+genesis = explode(graph)
+rebuilt, _ = GraphKernel({"nodes": [], "edges": []}, genesis).view()
+check("graph rebuilds exactly from its genesis event log (from empty)",
+      rebuilt["nodes"] == graph["nodes"] and rebuilt["edges"] == graph["edges"])
+errs, _ = afc.validate_graph(rebuilt)
+check("rebuilt graph validates", not errs)
 
 print("== conformance (validate every example graph) ==")
 for ex in ("schema/examples/graph.example.json", "examples/research.graph.json",

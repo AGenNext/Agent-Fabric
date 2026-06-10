@@ -17,19 +17,37 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from fabriclib import read_json
-from kernel import GraphKernel
+from kernel import GraphKernel, explode
 
 
 def main(argv=None):
     ap = argparse.ArgumentParser(description="Fold a GraphEvent stream onto a base graph (dry-run).")
     ap.add_argument("base", help="base graph JSON")
-    ap.add_argument("events", help="event stream JSON (array of GraphEvent)")
+    ap.add_argument("events", nargs="?", help="event stream JSON (array of GraphEvent)")
+    ap.add_argument("--explode", action="store_true",
+                    help="emit the genesis event log that rebuilds BASE from empty (ignores EVENTS)")
     ap.add_argument("--at", type=int, help="fold only events with sequence <= AT")
-    ap.add_argument("-o", "--out", help="write projected graph JSON here (default: stdout)")
+    ap.add_argument("-o", "--out", help="write JSON here (default: stdout)")
     ap.add_argument("--summary", action="store_true", help="print a change summary to stderr only")
     args = ap.parse_args(argv)
 
     base = read_json(args.base)
+
+    if args.explode:
+        genesis = explode(base)
+        print(f"sim: {len(genesis)} genesis event(s) rebuild "
+              f"{len(base.get('nodes', []))} node(s) / {len(base.get('edges', []))} edge(s)",
+              file=sys.stderr)
+        out = json.dumps(genesis, indent=2)
+        if args.out:
+            with open(args.out, "w") as fh:
+                fh.write(out + "\n")
+        else:
+            print(out)
+        return 0
+
+    if not args.events:
+        ap.error("EVENTS is required unless --explode is given")
     events = read_json(args.events)
     if isinstance(events, dict):
         events = events.get("events", [events])

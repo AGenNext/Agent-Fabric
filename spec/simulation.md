@@ -63,7 +63,26 @@ the same stream prefix always yields the same projection.
 python tools/sim.py base.json events.json --at 44 -o at-44.json
 ```
 
-## 4. Guarantees & scope
+## 4. Rebuild & sustainability
+
+The world model is reconstructable from its log. `explode(graph)` decomposes a
+graph into a **genesis event log** — one `upsert` per node and edge — and
+folding that log onto an empty graph reproduces the original exactly. So the
+graph and its event log are interconvertible, and nothing depends on a fragile
+materialized state: lose the snapshot, replay the log, get the model back.
+
+```bash
+# emit the genesis log that rebuilds a graph from empty
+python tools/sim.py examples/research.graph.json --explode -o genesis.json
+
+# rebuild from nothing
+echo '{"nodes":[],"edges":[]}' > empty.json
+python tools/sim.py empty.json genesis.json -o rebuilt.json   # == research.graph.json
+```
+
+The e2e test asserts this round-trip (`tests/e2e.py`).
+
+## 5. Guarantees & scope
 
 - **Non-destructive.** Only an explicit `-o` writes anything; the base and
   stream are read-only.

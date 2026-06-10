@@ -13,6 +13,30 @@ def _seq(ev):
     return ev.get("sequence", 0)
 
 
+def explode(graph, stream="genesis"):
+    """Decompose a graph into a genesis GraphEvent log that rebuilds it from
+    empty. Folding the result onto an empty graph reproduces the input — the
+    sustainability guarantee: the world model is reconstructable from its log.
+    """
+    occurred = graph.get("watermark", {}).get("asOf", "1970-01-01T00:00:00Z")
+    events, seq = [], 0
+    for target, elements in (("node", graph.get("nodes", [])),
+                             ("edge", graph.get("edges", []))):
+        for element in elements:
+            seq += 1
+            events.append({
+                "id": f"af:event/genesis-{seq}",
+                "kind": "GraphEvent",
+                "stream": stream,
+                "sequence": seq,
+                "op": "upsert",
+                "target": target,
+                "occurredAt": occurred,
+                "payload": element,
+            })
+    return events
+
+
 def merge(existing, payload):
     """Apply an upsert payload onto an existing element (attributes shallow-merge)."""
     for k, v in payload.items():

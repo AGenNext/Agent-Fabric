@@ -72,4 +72,9 @@ python tools/sim.py schema/examples/graph.example.json \
 
 # time-travel: fold only events up to sequence 44
 python tools/sim.py base.json events.json --at 44 --summary
+
+# rebuild/sustainability: emit the genesis log that reconstructs a graph from empty
+python tools/sim.py examples/research.graph.json --explode -o genesis.json
+echo '{"nodes":[],"edges":[]}' > empty.json
+python tools/sim.py empty.json genesis.json -o rebuilt.json   # == research.graph.json
 ```
