@@ -73,15 +73,30 @@ coercion (numbers, booleans) and fall back to string equality. Operators are
 Because hops compose, a query expresses a path pattern; multi-hop queries are
 the intersection of each stage's reachability.
 
-## 5. CLI
+## 5. Ego-view
+
+Every party is the centre of its own view. `--ego NODE [--radius N]` returns the
+**ego-network** — the centre node plus every node within `N` hops in any
+direction (default radius 1). No QUERY is needed, and nothing is materialized;
+it is a neighborhood walk over the same edge indexes.
 
 ```bash
-bql.py GRAPH.json "QUERY"          # tab-separated id / kind / label
-bql.py GRAPH.json -f query.bql     # read query from a file
-bql.py GRAPH.json "QUERY" --json   # emit full node objects
+bql.py GRAPH.json --ego af:agent/researcher-3 --radius 2
 ```
 
-Exit codes: `0` ok · `2` query syntax error.
+Combine with `--events` to see a party's world in the emulated state.
+
+## 6. CLI
+
+```bash
+bql.py GRAPH.json "QUERY"                    # tab-separated id / kind / label
+bql.py GRAPH.json -f query.bql               # read query from a file
+bql.py GRAPH.json "QUERY" --json             # emit full node objects
+bql.py GRAPH.json --ego NODE [--radius N]    # ego-network around a node
+bql.py GRAPH.json "QUERY" --events EV [--at SEQ]  # query emulated state
+```
+
+Exit codes: `0` ok · `2` query syntax/center error.
 
 ## 6. Scope & limitations
 

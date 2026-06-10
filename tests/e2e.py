@@ -59,6 +59,11 @@ check("multi-hop with attribute filters",
                "> runs_on > runtime[platform=kubernetes]") == ["af:runtime/k8s-prod-eu"])
 check("reverse hop", q(graph, "tool:web-search < uses < agent") == ["af:agent/researcher-3"])
 check("wildcard predicate", q(graph, "policy:web-readonly > * > tool") == ["af:tool/web-search"])
+ego1 = {n["id"] for n in bql.ego(graph, "af:agent/researcher-3", 1)}
+check("ego radius 1 = center + immediate neighbors",
+      "af:agent/researcher-3" in ego1 and "af:tool/web-search" in ego1 and len(ego1) == 8)
+ego2 = {n["id"] for n in bql.ego(graph, "af:agent/orchestrator-7", 2)}
+check("ego radius 2 reaches two hops out", "af:tool/web-search" in ego2)
 
 print("== emulation (kernel) ==")
 base = read("schema/examples/graph.example.json")

@@ -151,6 +151,31 @@ def evaluate(graph, query):
     return [nodes[nid] for nid in current]
 
 
+def ego(graph, center, radius=1):
+    """Return the ego-network: the center node and every node within `radius`
+    hops, in any edge direction. Each party is the centre of its own view."""
+    nodes = {n["id"]: n for n in graph["nodes"]}
+    if center not in nodes:
+        raise ValueError(f"unknown center node: {center}")
+    adj = defaultdict(set)
+    for e in graph["edges"]:
+        adj[e["from"]].add(e["to"])
+        adj[e["to"]].add(e["from"])
+    order, seen, frontier = [center], {center}, [center]
+    for _ in range(max(0, radius)):
+        nxt = []
+        for nid in frontier:
+            for neigh in adj.get(nid, ()):
+                if neigh not in seen and neigh in nodes:
+                    seen.add(neigh)
+                    order.append(neigh)
+                    nxt.append(neigh)
+        frontier = nxt
+        if not frontier:
+            break
+    return [nodes[nid] for nid in order]
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(description="Query an Agent-Fabric graph with BQL.")
     ap.add_argument("graph", help="compiled graph JSON file")
@@ -159,6 +184,8 @@ def main(argv=None):
     ap.add_argument("--events", help="overlay this GraphEvent stream and query the "
                                      "emulated state (no subgraph materialized)")
     ap.add_argument("--at", type=int, help="with --events: overlay only up to sequence AT")
+    ap.add_argument("--ego", help="return the ego-network centered on this node id (no QUERY needed)")
+    ap.add_argument("--radius", type=int, default=1, help="ego radius in hops (default 1)")
     ap.add_argument("--json", action="store_true", help="emit full node objects as JSON")
     args = ap.parse_args(argv)
 
@@ -167,8 +194,8 @@ def main(argv=None):
             q = fh.read()
     else:
         q = args.query
-    if not q:
-        ap.error("provide a query string or -f FILE")
+    if not q and not args.ego:
+        ap.error("provide a query string, -f FILE, or --ego NODE")
 
     graph = read_json(args.graph)
     if args.events:
@@ -178,7 +205,7 @@ def main(argv=None):
             events = events.get("events", [events])
         graph, _ = GraphKernel(graph, events, until=args.at).view()
     try:
-        results = evaluate(graph, q)
+        results = ego(graph, args.ego, args.radius) if args.ego else evaluate(graph, q)
     except ValueError as e:
         print(f"bql: {e}", file=sys.stderr)
         return 2
