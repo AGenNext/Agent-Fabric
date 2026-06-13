@@ -1,51 +1,71 @@
-# Agent-Fabric
+# Agent Fabric
 
-Agent-Fabric maps and manages the relationship graph of the AGenNext autonomous ecosystem.
+Agent Fabric is the assertion-native operating model for AGenNext.
 
-## Decision
+This repository defines the canonical primitives required to represent, verify, project, and reconcile governed reality across agents, services, devices, workspaces, organizations, and digital twins.
 
-Agent-Fabric is the graph/fabric layer connecting agents, humans, teams, tools, skills, runtimes, resources, policies, traces, identities, and workspaces.
+## Fabric Core
 
-It is the ecosystem topology and relationship layer for AGenNext.
+Fabric reduces governed systems to seven canonical records:
 
-## Scope
+1. `Entity`
+2. `Relationship`
+3. `Assertion`
+4. `Observation`
+5. `Projection`
+6. `Drift`
+7. `Reconciliation`
 
-Agent-Fabric owns:
+Everything else is an extension of these records.
 
-- agent relationship graphs
-- team topology
-- runtime topology
-- workspace topology
-- tool/skill dependency maps
-- policy relationship graphs
-- trust and interaction graphs
-- trace relationship mapping
-- organizational graph views
-- cross-agent dependency mapping
+## Core Principle
 
-## Boundary
+```text
+Identity establishes existence.
+Relationships establish context.
+Assertions establish truth.
+Observations establish reality.
+Projections establish visibility.
+Drift establishes difference.
+Reconciliation establishes order.
+```
 
-| Component | Responsibility |
-|---|---|
-| Agent-Fabric | Ecosystem relationship graph and topology |
-| Agent-Team | Agent team definitions |
-| Agent-Graph | Workflow/agent execution graph |
-| Agent-Traces | Timeline and execution evidence |
-| Agent-Identity | Identity and ownership relationships |
-| Agent-IGA | Governance and entitlement relationships |
-| Agent-Platform | Final operational authority |
+## Repository Layout
 
-## Rule
+```text
+specs/fabric-core-v1.md        Normative Fabric Core specification
+schemas/v1/*.schema.json       JSON Schemas for canonical records
+examples/v1/*.json             Valid example records
+.github/workflows/validate.yml Schema validation workflow
+```
 
-The ecosystem graph should remain traceable, queryable, and versioned.
+## Fabric Core Conformance
 
-## Meta-Model
+A Fabric-compliant implementation MUST support:
 
-The multi-model, real-time graph meta-model for autonomous agents. It is
+- identity resolution
+- assertion storage
+- signature verification
+- schema validation
+- projection generation
+- drift detection
+- reconciliation recording
+
+## Status
+
+Draft v1.0.
+
+---
+
+## Meta-Model & Toolchain
+
+The reference implementation of Fabric as a multi-model, real-time graph
+meta-model for autonomous agents. It is
 **multi-model** (one heterogeneous graph over **12 node kinds** and **22 relation
 predicates**), **real-time** (the graph is the deterministic fold of an
 append-only `GraphEvent` chain), and a **meta-model** (kinds, predicates, and
-lifecycle states are first-class, versioned **registries**).
+lifecycle states are first-class, versioned **registries**). The ecosystem
+graph stays traceable, queryable, and versioned.
 
 **Read the spec:** **[`spec/SPECIFICATION.md`](spec/SPECIFICATION.md)** is the
 complete book; [`meta-model`](spec/meta-model.md) · [`dsl`](spec/dsl.md) ·

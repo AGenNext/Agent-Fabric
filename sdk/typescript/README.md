@@ -1,10 +1,11 @@
 # @agennext/agent-fabric — TypeScript + NestJS SDK
 
-A typed, dependency-light SDK for the Agent-Fabric meta-model. Graphs and events
-are plain JSON; this package adds the **vocabulary**, **types**, the
-**GraphKernel** (emulation/rebuild), **query** helpers (ego, hop, byKind), and a
-**NestJS module/service**. Pure TypeScript — NestJS is an optional peer
-dependency, so the core works in any Node/TS project.
+The TypeScript SDK targets Horizon, dashboards, browser surfaces, and
+MCP/OpenAPI clients. It is a typed, dependency-light SDK for the Agent-Fabric
+meta-model: graphs and events are plain JSON, and this package adds the
+**vocabulary**, **types**, the **GraphKernel** (emulation/rebuild), **query**
+helpers (ego, hop, byKind), and a **NestJS module/service**. Pure TypeScript —
+NestJS is an optional peer dependency, so the core works in any Node/TS project.
 
 ## Install
 

@@ -1,0 +1,1 @@
+{"name":"Agent-Fabric Protocol Lock","version":"0.1.0","locks":{"protocol":"spec/fabric.protocol.json","tools":"spec/mcp.tools.json","resources":"spec/mcp.resources.json","prompts":"spec/mcp.prompts.json","openapi":"sdk/spec/openapi.yaml","context":"contexts/fabric.context.jsonld"}}
