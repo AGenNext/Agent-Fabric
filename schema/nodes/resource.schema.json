@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schema.agennext.dev/agent-fabric/nodes/resource.schema.json",
+  "title": "Resource",
+  "description": "A protected asset agents act upon (dataset, model, secret, queue, document, budget).",
+  "allOf": [{ "$ref": "https://schema.agennext.dev/agent-fabric/meta/entity.schema.json" }],
+  "properties": {
+    "kind": { "const": "Resource" },
+    "attributes": {
+      "type": "object",
+      "properties": {
+        "resourceType": { "type": "string", "description": "e.g. dataset, model, secret, queue, document, budget." },
+        "uri": { "type": "string" },
+        "sensitivity": { "type": "string", "enum": ["public", "internal", "confidential", "restricted"] }
+      },
+      "additionalProperties": true
+    }
+  },
+  "required": ["kind"]
+}

@@ -1,0 +1,14 @@
+{
+  "id": "af:registry/states",
+  "kind": "StateRegistry",
+  "version": "1.0.0",
+  "schema": "https://schema.agennext.dev/agent-fabric/meta/state.schema.json",
+  "states": [
+    { "name": "proposed", "description": "Asserted but not yet promoted (default — everything starts as a proposal)." },
+    { "name": "active", "description": "Promoted and in effect (via migration, once correctness is enforced)." },
+    { "name": "degraded", "description": "Active but impaired." },
+    { "name": "suspended", "description": "Temporarily inactive, may resume." },
+    { "name": "retired", "description": "Permanently decommissioned." },
+    { "name": "deleted", "description": "Tombstoned." }
+  ]
+}

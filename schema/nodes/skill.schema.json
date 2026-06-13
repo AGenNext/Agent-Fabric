@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schema.agennext.dev/agent-fabric/nodes/skill.schema.json",
+  "title": "Skill",
+  "description": "A packaged, reusable competency (procedure, prompt, playbook) an agent can apply. Skills may DEPEND_ON tools or other skills.",
+  "allOf": [{ "$ref": "https://schema.agennext.dev/agent-fabric/meta/entity.schema.json" }],
+  "properties": {
+    "kind": { "const": "Skill" },
+    "attributes": {
+      "type": "object",
+      "properties": {
+        "category": { "type": "string" },
+        "inputs": { "type": "array", "items": { "type": "string" } },
+        "outputs": { "type": "array", "items": { "type": "string" } },
+        "maturity": { "type": "string", "enum": ["experimental", "beta", "stable", "deprecated"] }
+      },
+      "additionalProperties": true
+    }
+  },
+  "required": ["kind"]
+}

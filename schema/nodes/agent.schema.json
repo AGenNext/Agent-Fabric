@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schema.agennext.dev/agent-fabric/nodes/agent.schema.json",
+  "title": "Agent",
+  "description": "An autonomous software agent participating in the ecosystem.",
+  "allOf": [{ "$ref": "https://schema.agennext.dev/agent-fabric/meta/entity.schema.json" }],
+  "properties": {
+    "kind": { "const": "Agent" },
+    "attributes": {
+      "type": "object",
+      "properties": {
+        "role": { "type": "string", "description": "Functional role (e.g. orchestrator, planner, executor, critic)." },
+        "model": { "type": "string", "description": "Backing model identifier the agent runs on." },
+        "autonomyLevel": { "type": "string", "enum": ["supervised", "semi-autonomous", "autonomous"] },
+        "capabilities": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+        "status": { "type": "string", "enum": ["idle", "busy", "blocked", "offline"] }
+      },
+      "additionalProperties": true
+    }
+  },
+  "required": ["kind"]
+}

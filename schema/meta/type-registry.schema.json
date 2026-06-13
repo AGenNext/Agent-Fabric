@@ -1,0 +1,92 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schema.agennext.dev/agent-fabric/meta/type-registry.schema.json",
+  "title": "TypeRegistry",
+  "description": "The meta-model itself: a self-describing registry that declares the legal node kinds and relation types of the fabric, including domain/range constraints and cardinality. The registry makes the graph a meta-model rather than an ad-hoc schema — kinds and predicates are first-class, versioned data.",
+  "type": "object",
+  "$defs": {
+    "nodeKind": {
+      "type": "object",
+      "description": "Declaration of one node kind (a meta-class).",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Kind name, matching Entity.kind (e.g. 'Agent')."
+        },
+        "schema": {
+          "type": "string",
+          "format": "iri-reference",
+          "description": "IRI of the JSON Schema that validates entities of this kind."
+        },
+        "abstract": {
+          "type": "boolean",
+          "default": false,
+          "description": "If true, the kind cannot be instantiated directly."
+        },
+        "description": { "type": "string" }
+      },
+      "required": ["name", "schema"],
+      "additionalProperties": false
+    },
+    "relationType": {
+      "type": "object",
+      "description": "Declaration of one relation type (a meta-predicate) with its domain/range constraints.",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Predicate name, matching Relation.relation (e.g. 'RUNS_ON')."
+        },
+        "description": { "type": "string" },
+        "domain": {
+          "type": "array",
+          "description": "Allowed node kinds for the 'from' endpoint. Empty = any.",
+          "items": { "type": "string" },
+          "uniqueItems": true
+        },
+        "range": {
+          "type": "array",
+          "description": "Allowed node kinds for the 'to' endpoint. Empty = any.",
+          "items": { "type": "string" },
+          "uniqueItems": true
+        },
+        "symmetric": {
+          "type": "boolean",
+          "default": false,
+          "description": "If true, the relation is undirected/symmetric."
+        },
+        "transitive": {
+          "type": "boolean",
+          "default": false,
+          "description": "If true, the predicate is transitive (e.g. DEPENDS_ON)."
+        },
+        "inverseOf": {
+          "type": "string",
+          "description": "Name of the inverse predicate, if any."
+        },
+        "cardinality": {
+          "type": "string",
+          "enum": ["one-to-one", "one-to-many", "many-to-one", "many-to-many"],
+          "default": "many-to-many"
+        }
+      },
+      "required": ["name"],
+      "additionalProperties": false
+    }
+  },
+  "properties": {
+    "$schema": { "type": "string" },
+    "id": { "type": "string", "format": "iri-reference" },
+    "kind": { "const": "TypeRegistry" },
+    "version": { "type": "string" },
+    "nodeKinds": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/nodeKind" }
+    },
+    "relationTypes": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/relationType" }
+    }
+  },
+  "required": ["kind", "nodeKinds", "relationTypes"],
+  "additionalProperties": false
+}

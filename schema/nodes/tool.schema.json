@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schema.agennext.dev/agent-fabric/nodes/tool.schema.json",
+  "title": "Tool",
+  "description": "An invocable capability (function, API, MCP server tool) an agent can call.",
+  "allOf": [{ "$ref": "https://schema.agennext.dev/agent-fabric/meta/entity.schema.json" }],
+  "properties": {
+    "kind": { "const": "Tool" },
+    "attributes": {
+      "type": "object",
+      "properties": {
+        "protocol": { "type": "string", "enum": ["mcp", "http", "grpc", "function", "cli"] },
+        "endpoint": { "type": "string" },
+        "sideEffects": { "type": "string", "enum": ["read-only", "write", "destructive"] },
+        "schemaRef": { "type": "string", "description": "Reference to the tool's input/output schema." }
+      },
+      "additionalProperties": true
+    }
+  },
+  "required": ["kind"]
+}

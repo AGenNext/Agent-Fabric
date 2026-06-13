@@ -1,0 +1,20 @@
+# Domain-namespaced authoring. The @domain becomes the identifier namespace:
+# ids are af:<domain>/<kind>/<name>. Node names may contain spaces, which are
+# collapsed to hyphens when forming the id.
+# Compile:  python tools/afc.py examples/namespaced.af --validate
+
+@id acme-snapshot
+@domain acme
+@tenant acme
+
+workspace billing platform
+  environment: prod
+
+agent invoice agent
+  scope: billing platform
+  role: executor
+  member_of: billing team
+
+team billing team
+  scope: billing platform
+  topology: flat

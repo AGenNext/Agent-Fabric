@@ -1,0 +1,17 @@
+# One node, any parties: a single Channel through which an agent, a human, and a
+# team all communicate. Compile:  python tools/fab.py compile examples/comms.af --validate
+
+@id comms-demo
+
+channel ops-room
+  medium: chat
+  visibility: team
+
+agent planner
+  participates_in: ops-room
+
+human on-call
+  participates_in: ops-room
+
+team sre
+  participates_in: ops-room
