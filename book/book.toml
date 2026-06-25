@@ -1,0 +1,17 @@
+[book]
+title = "Agent Fabric"
+authors = ["AGenNext"]
+description = "The kernel-native, real-time, structured metabase for enterprise autonomous agents."
+src = "src"
+language = "en"
+
+[output.html]
+default-theme = "navy"
+preferred-dark-theme = "navy"
+git-repository-url = "https://github.com/AGenNextHub/Agent-Fabric"
+edit-url-template = "https://github.com/AGenNextHub/Agent-Fabric/edit/main/book/{path}"
+additional-css = []
+
+[output.html.fold]
+enable = true
+level = 1
