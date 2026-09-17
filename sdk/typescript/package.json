@@ -16,7 +16,13 @@
   "peerDependenciesMeta": {
     "@nestjs/common": { "optional": true }
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "devDependencies": {
+    "@nestjs/common": "^11",
+    "reflect-metadata": "^0.2",
+    "rxjs": "^7",
     "typescript": "^5"
   }
 }
