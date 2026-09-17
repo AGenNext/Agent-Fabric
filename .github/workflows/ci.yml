@@ -1,0 +1,59 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  conformance:
+    name: fab test (py${{ matrix.python-version }}, ${{ matrix.validation }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12", "3.13"]
+        # Exercise both validation paths: the zero-dependency built-in checker
+        # (the mode the Docker image runs in) and the full JSON Schema checker.
+        validation: [builtin, jsonschema]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install JSON Schema deps
+        if: matrix.validation == 'jsonschema'
+        run: python -m pip install jsonschema referencing
+
+      - name: Conformance suite (32 checks)
+        run: python tools/fab.py test
+
+  sdk-typescript:
+    name: build the TypeScript / NestJS SDK
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: sdk/typescript
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: sdk/typescript/package-lock.json
+
+      - name: Install
+        run: npm ci
+
+      - name: Build (tsc)
+        run: npm run build
