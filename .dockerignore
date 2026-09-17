@@ -1,0 +1,12 @@
+.git
+**/__pycache__
+**/*.pyc
+book/book
+node_modules
+sdk/typescript/dist
+sdk/typescript/node_modules
+*.md
+!spec/*.md
+.github
+Dockerfile
+.dockerignore

@@ -226,15 +226,19 @@ def builtin_check(graph):
         if n.get("kind") not in valid_kinds:
             errs.append(f"unregistered node kind: {n.get('kind')!r} ({n.get('id')})")
         ids.add(n.get("id"))
+    # Edge endpoints may reference a node *or* another edge: provenance
+    # predicates (e.g. EVIDENCED_BY) attach evidence to a relation, so an edge
+    # id is a valid endpoint. Collect edge ids before checking references.
+    endpoints = ids | {e.get("id") for e in graph.get("edges", [])}
     for e in graph.get("edges", []):
         for k in ("id", "relation", "from", "to"):
             if k not in e:
                 errs.append(f"edge missing {k}: {e.get('id', e)}")
         if e.get("relation", "").lower() not in predicates:
             errs.append(f"unregistered relation: {e.get('relation')!r} ({e.get('id')})")
-        if e.get("from") not in ids:
+        if e.get("from") not in endpoints:
             errs.append(f"dangling 'from': {e.get('id')} -> {e.get('from')}")
-        if e.get("to") not in ids:
+        if e.get("to") not in endpoints:
             errs.append(f"dangling 'to': {e.get('id')} -> {e.get('to')}")
     return errs
 

@@ -137,6 +137,23 @@ python tools/fab.py test
 
 Each subcommand is also a standalone script under [`tools/`](tools/).
 
+### Run with Docker
+
+The toolchain ships as a container image on GHCR — the `ENTRYPOINT` is `fab`, so
+any subcommand works directly:
+
+```bash
+docker run --rm ghcr.io/agennexthub/agent-fabric:latest test
+docker run --rm -v "$PWD:/work" -w /work \
+  ghcr.io/agennexthub/agent-fabric:latest grade examples/research.graph.json
+```
+
+The image is pure Python standard library, runs as an unprivileged user, and its
+build fails unless the 32-check conformance suite passes. It is published by
+[`.github/workflows/docker-publish.yml`](.github/workflows/docker-publish.yml)
+on every push to `main` and every `v*` tag (`latest`, the branch/tag name,
+the semver, and the commit SHA).
+
 ### Ships with its vocabulary, in every language
 
 The [registries](schema/registry/) (types + states) are the single source of
