@@ -1,0 +1,178 @@
+{
+  "@context": "https://schema.agennext.dev/agent-fabric/context.jsonld",
+  "id": "af:graph/research-snapshot",
+  "kind": "Graph",
+  "nodes": [
+    {
+      "id": "af:workspace/research",
+      "kind": "Workspace",
+      "attributes": {
+        "environment": "prod",
+        "purpose": "Autonomous research squad"
+      }
+    },
+    {
+      "id": "af:agent/orchestrator-7",
+      "kind": "Agent",
+      "scope": "af:workspace/research",
+      "attributes": {
+        "role": "orchestrator",
+        "model": "claude-opus-4-8",
+        "autonomyLevel": "autonomous",
+        "status": "busy"
+      }
+    },
+    {
+      "id": "af:agent/researcher-3",
+      "kind": "Agent",
+      "scope": "af:workspace/research",
+      "attributes": {
+        "role": "executor",
+        "model": "claude-sonnet-4-6",
+        "autonomyLevel": "semi-autonomous",
+        "status": "busy"
+      }
+    },
+    {
+      "id": "af:team/research-squad",
+      "kind": "Team",
+      "scope": "af:workspace/research",
+      "attributes": {
+        "topology": "hub-and-spoke",
+        "size": 2
+      }
+    },
+    {
+      "id": "af:tool/web-search",
+      "kind": "Tool",
+      "attributes": {
+        "protocol": "mcp",
+        "sideEffects": "read-only"
+      }
+    },
+    {
+      "id": "af:runtime/k8s-prod-eu",
+      "kind": "Runtime",
+      "attributes": {
+        "platform": "kubernetes",
+        "region": "eu-west-1",
+        "health": "healthy"
+      }
+    },
+    {
+      "id": "af:identity/sa-researcher",
+      "kind": "Identity",
+      "attributes": {
+        "principalType": "service-account",
+        "issuer": "agent-identity"
+      }
+    },
+    {
+      "id": "af:policy/web-readonly",
+      "kind": "Policy",
+      "attributes": {
+        "policyType": "access",
+        "effect": "allow"
+      }
+    },
+    {
+      "id": "af:resource/corpus-v4",
+      "kind": "Resource",
+      "attributes": {
+        "resourceType": "dataset",
+        "sensitivity": "internal"
+      }
+    },
+    {
+      "id": "af:trace/run-91af",
+      "kind": "Trace",
+      "attributes": {
+        "traceRef": "traces:run-91af",
+        "outcome": "success"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "af:rel/1",
+      "relation": "MEMBER_OF",
+      "from": "af:agent/orchestrator-7",
+      "to": "af:team/research-squad"
+    },
+    {
+      "id": "af:rel/2",
+      "relation": "DELEGATES_TO",
+      "from": "af:agent/orchestrator-7",
+      "to": "af:agent/researcher-3",
+      "weight": 0.8
+    },
+    {
+      "id": "af:rel/3",
+      "relation": "MEMBER_OF",
+      "from": "af:agent/researcher-3",
+      "to": "af:team/research-squad"
+    },
+    {
+      "id": "af:rel/4",
+      "relation": "USES",
+      "from": "af:agent/researcher-3",
+      "to": "af:tool/web-search"
+    },
+    {
+      "id": "af:rel/5",
+      "relation": "INVOKES",
+      "from": "af:agent/researcher-3",
+      "to": "af:tool/web-search",
+      "weight": 17,
+      "attributes": {
+        "callCount": 17
+      }
+    },
+    {
+      "id": "af:rel/6",
+      "relation": "RUNS_ON",
+      "from": "af:agent/researcher-3",
+      "to": "af:runtime/k8s-prod-eu"
+    },
+    {
+      "id": "af:rel/7",
+      "relation": "ASSUMES_IDENTITY",
+      "from": "af:agent/researcher-3",
+      "to": "af:identity/sa-researcher"
+    },
+    {
+      "id": "af:rel/8",
+      "relation": "ACCESSES",
+      "from": "af:agent/researcher-3",
+      "to": "af:resource/corpus-v4"
+    },
+    {
+      "id": "af:rel/9",
+      "relation": "PRODUCED",
+      "from": "af:agent/researcher-3",
+      "to": "af:trace/run-91af"
+    },
+    {
+      "id": "af:rel/10",
+      "relation": "GOVERNED_BY",
+      "from": "af:tool/web-search",
+      "to": "af:policy/web-readonly"
+    },
+    {
+      "id": "af:rel/11",
+      "relation": "DEPLOYED_IN",
+      "from": "af:runtime/k8s-prod-eu",
+      "to": "af:workspace/research"
+    },
+    {
+      "id": "af:rel/12",
+      "relation": "GRANTS",
+      "from": "af:policy/web-readonly",
+      "to": "af:tool/web-search"
+    }
+  ],
+  "tenant": "agennext",
+  "watermark": {
+    "asOf": "2026-06-07T12:00:00Z"
+  }
+}

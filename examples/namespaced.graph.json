@@ -1,0 +1,42 @@
+{
+  "@context": "https://schema.agennext.dev/agent-fabric/context.jsonld",
+  "id": "af:graph/acme-snapshot",
+  "kind": "Graph",
+  "nodes": [
+    {
+      "id": "af:acme/workspace/billing-platform",
+      "kind": "Workspace",
+      "attributes": {
+        "environment": "prod"
+      }
+    },
+    {
+      "id": "af:acme/agent/invoice-agent",
+      "kind": "Agent",
+      "scope": "af:acme/workspace/billing-platform",
+      "attributes": {
+        "role": "executor"
+      }
+    },
+    {
+      "id": "af:acme/team/billing-team",
+      "kind": "Team",
+      "scope": "af:acme/workspace/billing-platform",
+      "attributes": {
+        "topology": "flat"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "af:rel/1",
+      "relation": "MEMBER_OF",
+      "from": "af:acme/agent/invoice-agent",
+      "to": "af:acme/team/billing-team"
+    }
+  ],
+  "tenant": "acme",
+  "watermark": {
+    "asOf": "1970-01-01T00:00:00Z"
+  }
+}

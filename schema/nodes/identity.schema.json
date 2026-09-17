@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schema.agennext.dev/agent-fabric/nodes/identity.schema.json",
+  "title": "Identity",
+  "description": "A principal/credentialed identity that agents and humans assume. Authoritative identity lives in Agent-Identity; Agent-Fabric maps ownership and assumption relationships (OWNS, HAS_IDENTITY, ASSUMES_IDENTITY).",
+  "allOf": [{ "$ref": "https://schema.agennext.dev/agent-fabric/meta/entity.schema.json" }],
+  "properties": {
+    "kind": { "const": "Identity" },
+    "attributes": {
+      "type": "object",
+      "properties": {
+        "principalType": { "type": "string", "enum": ["service-account", "user", "workload", "role"] },
+        "issuer": { "type": "string" },
+        "subject": { "type": "string", "description": "Subject claim / principal identifier." }
+      },
+      "additionalProperties": true
+    }
+  },
+  "required": ["kind"]
+}

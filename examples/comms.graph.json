@@ -1,0 +1,50 @@
+{
+  "@context": "https://schema.agennext.dev/agent-fabric/context.jsonld",
+  "id": "af:graph/comms-demo",
+  "kind": "Graph",
+  "nodes": [
+    {
+      "id": "af:channel/ops-room",
+      "kind": "Channel",
+      "attributes": {
+        "medium": "chat",
+        "visibility": "team"
+      }
+    },
+    {
+      "id": "af:agent/planner",
+      "kind": "Agent"
+    },
+    {
+      "id": "af:human/on-call",
+      "kind": "Human"
+    },
+    {
+      "id": "af:team/sre",
+      "kind": "Team"
+    }
+  ],
+  "edges": [
+    {
+      "id": "af:rel/1",
+      "relation": "PARTICIPATES_IN",
+      "from": "af:agent/planner",
+      "to": "af:channel/ops-room"
+    },
+    {
+      "id": "af:rel/2",
+      "relation": "PARTICIPATES_IN",
+      "from": "af:human/on-call",
+      "to": "af:channel/ops-room"
+    },
+    {
+      "id": "af:rel/3",
+      "relation": "PARTICIPATES_IN",
+      "from": "af:team/sre",
+      "to": "af:channel/ops-room"
+    }
+  ],
+  "watermark": {
+    "asOf": "1970-01-01T00:00:00Z"
+  }
+}

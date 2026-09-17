@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schema.agennext.dev/agent-fabric/nodes/node.schema.json",
+  "title": "Node",
+  "description": "Discriminated union of every concrete node kind. A value is a valid node iff it matches exactly one kind schema (each pins `kind` to a distinct const). Use this — not the base Entity — wherever a fully validated node is expected, so kind-specific attribute rules are enforced.",
+  "oneOf": [
+    { "$ref": "https://schema.agennext.dev/agent-fabric/nodes/agent.schema.json" },
+    { "$ref": "https://schema.agennext.dev/agent-fabric/nodes/human.schema.json" },
+    { "$ref": "https://schema.agennext.dev/agent-fabric/nodes/team.schema.json" },
+    { "$ref": "https://schema.agennext.dev/agent-fabric/nodes/tool.schema.json" },
+    { "$ref": "https://schema.agennext.dev/agent-fabric/nodes/skill.schema.json" },
+    { "$ref": "https://schema.agennext.dev/agent-fabric/nodes/runtime.schema.json" },
+    { "$ref": "https://schema.agennext.dev/agent-fabric/nodes/resource.schema.json" },
+    { "$ref": "https://schema.agennext.dev/agent-fabric/nodes/policy.schema.json" },
+    { "$ref": "https://schema.agennext.dev/agent-fabric/nodes/trace.schema.json" },
+    { "$ref": "https://schema.agennext.dev/agent-fabric/nodes/identity.schema.json" },
+    { "$ref": "https://schema.agennext.dev/agent-fabric/nodes/workspace.schema.json" },
+    { "$ref": "https://schema.agennext.dev/agent-fabric/nodes/channel.schema.json" }
+  ]
+}

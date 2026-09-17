@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schema.agennext.dev/agent-fabric/nodes/human.schema.json",
+  "title": "Human",
+  "description": "A human participant (operator, owner, reviewer, stakeholder) in the ecosystem.",
+  "allOf": [{ "$ref": "https://schema.agennext.dev/agent-fabric/meta/entity.schema.json" }],
+  "properties": {
+    "kind": { "const": "Human" },
+    "attributes": {
+      "type": "object",
+      "properties": {
+        "role": { "type": "string", "description": "e.g. operator, owner, reviewer, approver." },
+        "email": { "type": "string", "format": "email" },
+        "timezone": { "type": "string" }
+      },
+      "additionalProperties": true
+    }
+  },
+  "required": ["kind"]
+}

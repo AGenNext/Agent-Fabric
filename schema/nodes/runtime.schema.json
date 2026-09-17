@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schema.agennext.dev/agent-fabric/nodes/runtime.schema.json",
+  "title": "Runtime",
+  "description": "An execution environment that hosts agents (container, sandbox, serverless pool, node). Forms the runtime topology via RUNS_ON / DEPLOYED_IN relations.",
+  "allOf": [{ "$ref": "https://schema.agennext.dev/agent-fabric/meta/entity.schema.json" }],
+  "properties": {
+    "kind": { "const": "Runtime" },
+    "attributes": {
+      "type": "object",
+      "properties": {
+        "platform": { "type": "string", "description": "e.g. kubernetes, firecracker, lambda, local." },
+        "region": { "type": "string" },
+        "capacity": { "type": "object", "additionalProperties": true },
+        "health": { "type": "string", "enum": ["healthy", "degraded", "down"] }
+      },
+      "additionalProperties": true
+    }
+  },
+  "required": ["kind"]
+}

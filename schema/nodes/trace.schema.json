@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schema.agennext.dev/agent-fabric/nodes/trace.schema.json",
+  "title": "Trace",
+  "description": "A pointer to execution evidence (a run, span, or timeline). Authoritative trace data lives in Agent-Traces; Agent-Fabric references traces as PRODUCED-by agents and EVIDENCED_BY assertions.",
+  "allOf": [{ "$ref": "https://schema.agennext.dev/agent-fabric/meta/entity.schema.json" }],
+  "properties": {
+    "kind": { "const": "Trace" },
+    "attributes": {
+      "type": "object",
+      "properties": {
+        "traceRef": { "type": "string", "description": "Identifier of the trace in Agent-Traces." },
+        "outcome": { "type": "string", "enum": ["success", "failure", "partial", "aborted"] },
+        "startedAt": { "type": "string", "format": "date-time" },
+        "endedAt": { "type": "string", "format": "date-time" }
+      },
+      "additionalProperties": true
+    }
+  },
+  "required": ["kind"]
+}

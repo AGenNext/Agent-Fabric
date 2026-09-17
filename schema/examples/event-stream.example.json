@@ -1,0 +1,68 @@
+[
+  {
+    "id": "af:event/1001",
+    "kind": "GraphEvent",
+    "stream": "agennext.core",
+    "sequence": 43,
+    "op": "upsert",
+    "target": "node",
+    "occurredAt": "2026-06-07T12:01:03Z",
+    "recordedAt": "2026-06-07T12:01:03Z",
+    "source": "agent-platform",
+    "correlationId": "task-5fa2",
+    "payload": {
+      "id": "af:agent/researcher-3",
+      "kind": "Agent",
+      "attributes": { "status": "idle" },
+      "observedAt": "2026-06-07T12:01:03Z"
+    }
+  },
+  {
+    "id": "af:event/1002",
+    "kind": "GraphEvent",
+    "stream": "agennext.core",
+    "sequence": 44,
+    "op": "upsert",
+    "target": "edge",
+    "occurredAt": "2026-06-07T12:01:05Z",
+    "source": "trace-ingest",
+    "correlationId": "task-5fa2",
+    "causationId": "af:event/1001",
+    "payload": {
+      "id": "af:rel/12",
+      "relation": "ACCESSES",
+      "from": "af:agent/researcher-3",
+      "to": "af:resource/corpus-v4",
+      "weight": 1,
+      "provenance": { "source": "trace-ingest", "evidence": ["af:trace/run-91af"], "confidence": 0.9 }
+    }
+  },
+  {
+    "id": "af:event/1003",
+    "kind": "GraphEvent",
+    "stream": "agennext.core",
+    "sequence": 45,
+    "op": "invalidate",
+    "target": "edge",
+    "occurredAt": "2026-06-07T12:05:00Z",
+    "source": "agent-platform",
+    "payload": {
+      "id": "af:rel/3",
+      "relation": "DELEGATES_TO",
+      "from": "af:agent/orchestrator-7",
+      "to": "af:agent/researcher-3",
+      "validTo": "2026-06-07T12:05:00Z"
+    }
+  },
+  {
+    "id": "af:event/1004",
+    "kind": "GraphEvent",
+    "stream": "agennext.core",
+    "sequence": 46,
+    "op": "delete",
+    "target": "node",
+    "occurredAt": "2026-06-07T12:10:00Z",
+    "source": "agent-platform",
+    "payload": { "id": "af:agent/researcher-3" }
+  }
+]

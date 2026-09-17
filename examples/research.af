@@ -1,0 +1,66 @@
+# Fabric Agent Language (FAL) — research squad snapshot.
+# Compile:  python tools/afc.py examples/research.af --validate
+
+@id research-snapshot
+@tenant agennext
+@asOf 2026-06-07T12:00:00Z
+
+workspace research
+  environment: prod
+  purpose: Autonomous research squad
+
+agent orchestrator-7
+  scope: research
+  role: orchestrator
+  model: claude-opus-4-8
+  autonomyLevel: autonomous
+  status: busy
+  member_of: research-squad
+  delegates_to: researcher-3 (weight=0.8)
+
+agent researcher-3
+  scope: research
+  role: executor
+  model: claude-sonnet-4-6
+  autonomyLevel: semi-autonomous
+  status: busy
+  member_of: research-squad
+  uses: web-search
+  invokes: web-search (weight=17, callCount=17)
+  runs_on: k8s-prod-eu
+  assumes_identity: sa-researcher
+  accesses: corpus-v4
+  produced: run-91af
+
+team research-squad
+  scope: research
+  topology: hub-and-spoke
+  size: 2
+
+tool web-search
+  protocol: mcp
+  sideEffects: read-only
+  governed_by: web-readonly
+
+runtime k8s-prod-eu
+  platform: kubernetes
+  region: eu-west-1
+  health: healthy
+  deployed_in: research
+
+identity sa-researcher
+  principalType: service-account
+  issuer: agent-identity
+
+policy web-readonly
+  policyType: access
+  effect: allow
+  grants: web-search
+
+resource corpus-v4
+  resourceType: dataset
+  sensitivity: internal
+
+trace run-91af
+  traceRef: traces:run-91af
+  outcome: success

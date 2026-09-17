@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schema.agennext.dev/agent-fabric/nodes/workspace.schema.json",
+  "title": "Workspace",
+  "description": "A bounded context partitioning the ecosystem (project, environment, tenant boundary). Entities are SCOPED_TO a workspace, forming the workspace topology.",
+  "allOf": [{ "$ref": "https://schema.agennext.dev/agent-fabric/meta/entity.schema.json" }],
+  "properties": {
+    "kind": { "const": "Workspace" },
+    "attributes": {
+      "type": "object",
+      "properties": {
+        "environment": { "type": "string", "enum": ["dev", "staging", "prod"] },
+        "purpose": { "type": "string" },
+        "parent": { "type": "string", "description": "IRI of a parent workspace, for nested topology." }
+      },
+      "additionalProperties": true
+    }
+  },
+  "required": ["kind"]
+}

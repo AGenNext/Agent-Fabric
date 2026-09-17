@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schema.agennext.dev/agent-fabric/nodes/policy.schema.json",
+  "title": "Policy",
+  "description": "A governance rule constraining behavior. Subjects are GOVERNED_BY policies; policies GRANT access to resources. Authoritative governance lives in Agent-IGA; Agent-Fabric maps the relationships.",
+  "allOf": [{ "$ref": "https://schema.agennext.dev/agent-fabric/meta/entity.schema.json" }],
+  "properties": {
+    "kind": { "const": "Policy" },
+    "attributes": {
+      "type": "object",
+      "properties": {
+        "policyType": { "type": "string", "enum": ["access", "rate-limit", "data-governance", "safety", "budget"] },
+        "effect": { "type": "string", "enum": ["allow", "deny", "require-approval"] },
+        "ruleRef": { "type": "string", "description": "Reference to the authoritative rule in Agent-IGA." }
+      },
+      "additionalProperties": true
+    }
+  },
+  "required": ["kind"]
+}

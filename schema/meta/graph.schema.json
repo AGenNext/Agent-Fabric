@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schema.agennext.dev/agent-fabric/meta/graph.schema.json",
+  "title": "Graph",
+  "description": "A materialized, versioned snapshot of the Agent-Fabric ecosystem graph: a set of entities (nodes) and relations (edges) plus a watermark describing how current the snapshot is.",
+  "type": "object",
+  "properties": {
+    "@context": {
+      "description": "JSON-LD context. Reference the canonical Agent-Fabric context.",
+      "oneOf": [
+        { "type": "string" },
+        { "type": "object" },
+        { "type": "array" }
+      ]
+    },
+    "id": {
+      "$ref": "https://schema.agennext.dev/agent-fabric/meta/entity.schema.json#/$defs/iri",
+      "description": "IRI of this graph snapshot."
+    },
+    "kind": { "const": "Graph" },
+    "tenant": { "type": "string" },
+    "scope": {
+      "$ref": "https://schema.agennext.dev/agent-fabric/meta/entity.schema.json#/$defs/iri",
+      "description": "Optional workspace this snapshot is partitioned to."
+    },
+    "watermark": {
+      "type": "object",
+      "description": "Real-time currency marker. Consumers can compare watermarks to detect staleness and to resume an event stream.",
+      "properties": {
+        "asOf": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Valid-time the snapshot represents."
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Last GraphEvent sequence number folded into this snapshot."
+        },
+        "stream": {
+          "type": "string",
+          "description": "Identifier of the event stream this snapshot was built from."
+        }
+      },
+      "required": ["asOf"],
+      "additionalProperties": false
+    },
+    "nodes": {
+      "type": "array",
+      "description": "Entities in the snapshot, each validated against its concrete node-kind schema.",
+      "items": { "$ref": "https://schema.agennext.dev/agent-fabric/nodes/node.schema.json" }
+    },
+    "edges": {
+      "type": "array",
+      "description": "Relations in the snapshot.",
+      "items": { "$ref": "https://schema.agennext.dev/agent-fabric/meta/relation.schema.json" }
+    }
+  },
+  "required": ["kind", "nodes", "edges"],
+  "additionalProperties": false
+}
