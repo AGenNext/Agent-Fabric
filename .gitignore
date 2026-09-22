@@ -9,3 +9,8 @@ venv/
 # OS / editor
 .DS_Store
 *.swp
+
+# api/ local key + usage store (never committed — see api/README.md)
+api/*.db
+api/*.db-wal
+api/*.db-shm
