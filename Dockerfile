@@ -21,7 +21,7 @@ COPY tests/ ./tests/
 RUN useradd --create-home --uid 10001 fabric && chown -R fabric:fabric /app
 USER fabric
 
-# Fail the build if the conformance suite regresses (32/32).
+# Fail the build if the conformance suite regresses (34/34).
 RUN python tools/fab.py test
 
 # `docker run <image> <subcommand> …` maps straight onto the fab CLI.

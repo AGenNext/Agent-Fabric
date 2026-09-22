@@ -57,6 +57,12 @@ check("forward hop", q(graph, "agent:orchestrator-7 > delegates_to > agent")
 check("multi-hop with attribute filters",
       q(graph, "agent:orchestrator-7 > delegates_to > agent[status=busy] "
                "> runs_on > runtime[platform=kubernetes]") == ["af:runtime/k8s-prod-eu"])
+check("!= filter operator",
+      q(graph, "agent:orchestrator-7 > delegates_to > agent[status!=idle]")
+      == ["af:agent/researcher-3"])
+check("multiple bracketed filter groups on one selector",
+      q(graph, "agent:orchestrator-7 > delegates_to > agent[status=busy][role!=orchestrator]")
+      == ["af:agent/researcher-3"])
 check("reverse hop", q(graph, "tool:web-search < uses < agent") == ["af:agent/researcher-3"])
 check("wildcard predicate", q(graph, "policy:web-readonly > * > tool") == ["af:tool/web-search"])
 ego1 = {n["id"] for n in bql.ego(graph, "af:agent/researcher-3", 1)}

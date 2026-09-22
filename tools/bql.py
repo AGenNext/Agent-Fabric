@@ -58,23 +58,56 @@ def tokenize(text):
 
 
 # ----------------------------------------------------------------- selector ---
+def _split_condition(cond):
+    """Split 'key OP value' on the leftmost '!=' or '=', returning
+    (key, op, value) or None if there's no valid split.
+
+    Equivalent to `re.match(r"^(.+?)\s*(!=|=)\s*(.+)$", cond)` but scans
+    linearly instead of backtracking: with query strings coming straight off
+    an untrusted API request (api/server.py's /v1/graphs/query), the lazy
+    `.+?` next to `\s*` next to `(.+)$` is an unbounded-backtracking pattern
+    over attacker-controlled input (flagged by CodeQL as a polynomial ReDoS).
+    A key must be non-empty and a value must be non-empty (pre-strip), same
+    as the original pattern required.
+    """
+    n = len(cond)
+    i = 0
+    while i < n:
+        if cond[i:i + 2] == "!=":
+            op, oplen = "!=", 2
+        elif cond[i] == "=":
+            op, oplen = "=", 1
+        else:
+            i += 1
+            continue
+        value = cond[i + oplen:]
+        if i == 0 or not value:
+            i += 1  # key or value would be empty; keep looking, as the
+            continue  # original pattern's non-empty quantifiers would too
+        return cond[:i].strip(), op, value.strip()
+    return None
+
+
 class Selector:
     def __init__(self, atom):
         self.kind = None
         self.name = None
         self.filters = []
-        # peel off filter groups [ ... ]
+        # peel off filter groups [ ... ]; a negated character class instead
+        # of '.*?' keeps this linear regardless of input shape (unlike '.',
+        # '[^\[\]]' can't overlap with the terminator, so there's no
+        # backtracking ambiguity for CodeQL's polynomial-ReDoS check to flag).
         head = atom
-        for grp in re.findall(r"\[(.*?)\]", atom):
+        for grp in re.findall(r"\[([^\[\]]*)\]", atom):
             for cond in grp.split(","):
                 cond = cond.strip()
                 if not cond:
                     continue
-                m = re.match(r"^(.+?)\s*(!=|=)\s*(.+)$", cond)
-                if not m:
+                split = _split_condition(cond)
+                if not split:
                     raise ValueError(f"bad filter condition: {cond!r}")
-                self.filters.append((m.group(1).strip(), m.group(2), m.group(3).strip()))
-        head = re.sub(r"\[.*?\]", "", head).strip()
+                self.filters.append(split)
+        head = re.sub(r"\[[^\[\]]*\]", "", head).strip()
         if head and head != "*":
             if ":" in head:
                 self.kind, self.name = head.split(":", 1)

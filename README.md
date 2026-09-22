@@ -119,7 +119,7 @@ python tools/fab.py grade examples/research.graph.json
 # migrate: promote proposals -> active, gated on correctness
 python tools/fab.py migrate examples/research.graph.json --min-quality 60 -o active.json
 
-# verify everything end-to-end (32/32)
+# verify everything end-to-end (34/34)
 python tools/fab.py test
 ```
 
@@ -133,7 +133,7 @@ python tools/fab.py test
 | `fab grade g.json` | quality | weighted rubric of verifiers → 0–100 + verdict |
 | `fab migrate g.json` | lifecycle | promote proposals → active, gated on correctness/quality |
 | `fab vocab [--lang …]` | vocabulary | print / export the registry vocabulary |
-| `fab test` | conformance | the 32-check e2e suite |
+| `fab test` | conformance | the 34-check e2e suite |
 
 Each subcommand is also a standalone script under [`tools/`](tools/).
 
@@ -149,7 +149,7 @@ docker run --rm -v "$PWD:/work" -w /work \
 ```
 
 The image is pure Python standard library, runs as an unprivileged user, and its
-build fails unless the 32-check conformance suite passes. It is published by
+build fails unless the 34-check conformance suite passes. It is published by
 [`.github/workflows/docker-publish.yml`](.github/workflows/docker-publish.yml)
 on every push to `main` and every `v*` tag (`latest`, the branch/tag name,
 the semver, and the commit SHA).
