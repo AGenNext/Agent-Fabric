@@ -18,6 +18,11 @@ Fabric Boxes, and it makes no claims about outcome contracts, SLAs, or
 authority chains — it wraps the four things `fab` already does correctly and
 meters who called what.
 
+**License:** this directory is proprietary (see [`LICENSE`](LICENSE)) — it
+is the sellable layer, not part of the Apache-2.0 open core described in the
+root [`NOTICE`](../NOTICE). It imports the Apache-2.0 `tools/` and `schema/`
+code as a dependency; that doesn't change either side's license.
+
 ## Run it
 
 ```bash

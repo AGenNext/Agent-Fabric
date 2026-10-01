@@ -1,0 +1,35 @@
+Agent Fabric
+Copyright 2026 AGenNext
+
+This repository is open-core: the specification, schemas, reference
+toolchain, SDKs, and supporting material are open source under the Apache
+License, Version 2.0 (see LICENSE). The hosted service that runs on top of
+them is proprietary.
+
+Covered by the Apache License, Version 2.0 (see LICENSE):
+
+    spec/       the Fabric Core / meta-model specification
+    schema/     JSON Schema, JSON-LD context, and the type/state registries
+    tools/      the fab reference toolchain (afc, bql, sim, kernel, grade,
+                migrate, fabriclib)
+    sdk/        generated language bindings (Python, TypeScript, Go, JSON)
+    examples/   .af sources and compiled example graphs
+    tests/      the e2e conformance suite
+    book/       the mdBook documentation site
+    box/        appliance/packaging notes
+
+NOT covered by the Apache License — proprietary, all rights reserved unless
+separately licensed in writing by AGenNext:
+
+    api/        the hosted HTTP API service (see api/LICENSE)
+    go/         the Fabric Orchestrator (service delivery infrastructure)
+    mcp/        the Fabric MCP server (service delivery infrastructure)
+    docs/       internal service-delivery, governance, and partnership
+                models — business documentation, not source code
+
+This split exists so the vocabulary and reference implementation can be
+adopted freely as a standard, while the service built on top of them is
+sold, per docs/platform-as-service-delivery-model.md and
+docs/partnership-model.md. When a directory's status isn't clear from this
+list, treat it as proprietary until the LICENSE file at its root (or this
+NOTICE) says otherwise.

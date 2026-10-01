@@ -1,0 +1,22 @@
+Copyright 2026 AGenNext. All rights reserved.
+
+This directory (api/ — the Agent Fabric hosted API service: server.py,
+keystore.py, manage_keys.py, test_api.py, Dockerfile, and this README) is
+proprietary software. It is NOT licensed under the Apache License, Version
+2.0 that covers the rest of this repository (see the root LICENSE and
+NOTICE files).
+
+No part of this directory may be copied, modified, distributed, hosted, or
+used to provide a competing service without prior written permission from
+AGenNext. Running this code against your own infrastructure for internal,
+non-commercial evaluation is permitted; redistributing it, or offering it
+(or a derivative of it) as a hosted service to third parties, is not,
+except under a separate written agreement.
+
+This directory depends on the Apache-2.0-licensed code in tools/ and
+schema/ elsewhere in this repository; that dependency does not change the
+license of this directory, and this directory's license does not change
+the Apache-2.0 status of the code it depends on.
+
+Contact AGenNext for commercial licensing or partnership terms — see
+docs/partnership-model.md for the tiers this repository already defines.

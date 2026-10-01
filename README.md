@@ -196,3 +196,11 @@ examples/ .af sources + compiled graphs (research, namespaced, comms)
 tests/    e2e.py — 32 conformance checks
 api/      hosted HTTP API: server, key/usage store, key-management CLI, tests
 ```
+
+### License
+
+Open-core: `spec/`, `schema/`, `tools/`, `sdk/`, `examples/`, `tests/`, and
+`book/` are licensed under [Apache 2.0](LICENSE) — adopt the spec, the
+registries, or the reference toolchain freely. `api/` (the hosted service)
+is proprietary — see [`api/LICENSE`](api/LICENSE). See [`NOTICE`](NOTICE)
+for the full per-directory breakdown, including `go/`, `mcp/`, and `docs/`.
