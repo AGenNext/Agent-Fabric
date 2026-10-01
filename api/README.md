@@ -37,6 +37,29 @@ docker build -f api/Dockerfile -t agent-fabric-api .
 docker run --rm -p 8080:8080 -v fabric-api-data:/data agent-fabric-api
 ```
 
+## Deploy to Railway
+
+[`railway.json`](../railway.json) at the repo root points Railway at this
+Dockerfile, so a GitHub-connected deploy needs no further config file — but
+two things still only an account holder can do, from the Railway dashboard:
+
+1. **New Project → Deploy from GitHub repo** → pick `AGenNext/Agent-Fabric`.
+   Railway reads `railway.json`, builds `api/Dockerfile`, and redeploys on
+   every push to `main`.
+2. **Add a volume mounted at `/data`.** Without one, the SQLite key/usage
+   store (`FABRIC_API_DB=/data/fabric_api.db`, set in the Dockerfile) resets
+   on every redeploy — the same persistence requirement that rules out a
+   stateless serverless platform in the first place (see below).
+3. Optionally set `FABRIC_API_RATE_LIMIT` / `FABRIC_API_MAX_BODY` as service
+   variables to override the defaults in [`server.py`](server.py).
+
+This also means serverless platforms (Vercel, Cloudflare Workers) aren't a
+fit for this service as built: `api/keystore.py` persists to a local
+SQLite file, and the server is a long-running process that binds a socket
+(`ThreadingHTTPServer.serve_forever()`), not a per-request function handler.
+Either would need the storage layer rewritten against a hosted database
+before it could run on one.
+
 Environment variables:
 
 | Variable | Default | Meaning |
