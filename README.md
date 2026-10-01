@@ -119,7 +119,7 @@ python tools/fab.py grade examples/research.graph.json
 # migrate: promote proposals -> active, gated on correctness
 python tools/fab.py migrate examples/research.graph.json --min-quality 60 -o active.json
 
-# verify everything end-to-end (32/32)
+# verify everything end-to-end (34/34)
 python tools/fab.py test
 ```
 
@@ -133,7 +133,7 @@ python tools/fab.py test
 | `fab grade g.json` | quality | weighted rubric of verifiers → 0–100 + verdict |
 | `fab migrate g.json` | lifecycle | promote proposals → active, gated on correctness/quality |
 | `fab vocab [--lang …]` | vocabulary | print / export the registry vocabulary |
-| `fab test` | conformance | the 32-check e2e suite |
+| `fab test` | conformance | the 34-check e2e suite |
 
 Each subcommand is also a standalone script under [`tools/`](tools/).
 
@@ -149,7 +149,7 @@ docker run --rm -v "$PWD:/work" -w /work \
 ```
 
 The image is pure Python standard library, runs as an unprivileged user, and its
-build fails unless the 32-check conformance suite passes. It is published by
+build fails unless the 34-check conformance suite passes. It is published by
 [`.github/workflows/docker-publish.yml`](.github/workflows/docker-publish.yml)
 on every push to `main` and every `v*` tag (`latest`, the branch/tag name,
 the semver, and the commit SHA).
@@ -168,6 +168,23 @@ Validation proves a model is *correct*; `fab grade` asks whether it is *good*
 model scores ~64/100 — "not ready" — flagging agents without identity/runtime,
 ungoverned resources, and missing provenance. See [`spec/quality.md`](spec/quality.md).
 
+### Hosted API
+
+[`api/`](api/) exposes compile/validate/grade/migrate/query over HTTP, with
+API-key auth and per-call usage metering — the first sellable slice of the
+service catalog in [`docs/platform-as-service-delivery-model.md`](docs/platform-as-service-delivery-model.md),
+scoped to what the toolchain can already deliver without any managed
+infrastructure:
+
+```bash
+python api/server.py --port 8080
+python api/manage_keys.py create --customer domain:acme --tier provider
+curl -H "Authorization: Bearer $KEY" -d @graph.json http://localhost:8080/v1/graphs/grade
+```
+
+See [`api/README.md`](api/README.md) for the full route list, pricing-unit
+mapping, and `docker build -f api/Dockerfile .`.
+
 ### Layout
 
 ```
@@ -177,4 +194,5 @@ tools/    fab · afc · bql · sim · kernel · grade · migrate · fabriclib
 sdk/      generated vocabulary: python · typescript · go · json
 examples/ .af sources + compiled graphs (research, namespaced, comms)
 tests/    e2e.py — 32 conformance checks
+api/      hosted HTTP API: server, key/usage store, key-management CLI, tests
 ```

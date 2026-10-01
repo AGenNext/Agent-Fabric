@@ -17,6 +17,17 @@ def read_json(path):
         return json.load(fh)
 
 
+def _looks_like_float(s):
+    """True for '-?\\d*\\.\\d+' (optional '-', digits, '.', digits), without a
+    regex: `coerce` runs on attribute values from both `.af` source (afc) and
+    BQL filter values (bql) — including, via api/server.py, text straight off
+    an untrusted API request — and `\\d*\\.\\d+` was flagged by CodeQL as a
+    polynomial ReDoS pattern on uncontrolled input."""
+    body = s[1:] if s.startswith("-") else s
+    int_part, dot, frac_part = body.partition(".")
+    return bool(dot) and frac_part.isdigit() and (int_part == "" or int_part.isdigit())
+
+
 def coerce(v):
     """Light scalar coercion for string values: bool, int, float, else str."""
     if isinstance(v, str):
@@ -24,7 +35,7 @@ def coerce(v):
             return v == "true"
         if re.fullmatch(r"-?\d+", v):
             return int(v)
-        if re.fullmatch(r"-?\d*\.\d+", v):
+        if _looks_like_float(v):
             return float(v)
     return v
 
