@@ -10,8 +10,16 @@ LABEL org.opencontainers.image.source="https://github.com/AGenNextHub/Agent-Fabr
 WORKDIR /app
 
 # Pure standard library — no pip install needed for the service itself.
+# examples/, sdk/, and tests/ aren't served at runtime, but `fab test` (the
+# conformance gate below) needs all three: examples/ holds the .af sources
+# and compiled graphs the e2e suite reads, sdk/ holds the generated
+# vocabulary the suite checks for drift against the registry, and tests/
+# holds the suite itself.
 COPY tools/ ./tools/
 COPY schema/ ./schema/
+COPY examples/ ./examples/
+COPY sdk/ ./sdk/
+COPY tests/ ./tests/
 COPY api/ ./api/
 
 # Fail the build if the toolchain the API wraps regresses.
