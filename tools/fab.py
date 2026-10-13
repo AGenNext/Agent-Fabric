@@ -10,6 +10,7 @@ mains, so `fab compile` == `afc`, `fab query` == `bql`, `fab sim` == `sim`.
     fab vocab                                            # print the shipped vocabulary
     fab grade   GRAPH.json [--json]                      # score model quality
     fab migrate GRAPH.json [--min-quality N]             # promote proposals -> active
+    fab serve   STORE/ [--host H --port P]               # run the HTTP metabase service
     fab test                                             # run the e2e suite
 
 Pure standard library; no install.
@@ -144,6 +145,9 @@ def main(argv=None):
     if cmd in ("migrate", "promote"):
         import migrate
         return migrate.main(rest)
+    if cmd in ("serve", "server", "service"):
+        import serve
+        return serve.main(rest)
     if cmd in ("test", "e2e"):
         import runpy
         try:

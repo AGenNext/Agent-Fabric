@@ -144,6 +144,34 @@ python tools/fab.py test
 
 Each subcommand is also a standalone script under [`tools/`](tools/).
 
+### Run as a service
+
+`fab serve` turns the toolchain into a running metabase — the Fabric Core
+kernel-boundary services over HTTP, still pure standard library. Storage is an
+**append-only event log** on disk (`events.jsonl` + optional `base.json`); every
+read is a calculated projection (the kernel fold), durable across restarts.
+
+```bash
+fab serve ./store --port 8777 &
+
+curl -XPOST localhost:8777/assert -d '{"op":"upsert","target":"node",
+  "payload":{"id":"af:agent/new-9","kind":"Agent","state":"proposed"}}'   # ASSERT
+curl localhost:8777/project                 # PROJECT: emulated graph (add ?at=SEQ to time-travel)
+curl 'localhost:8777/query?ego=af:agent/new-9&radius=1'   # query the projection
+curl localhost:8777/verify                  # VERIFY: validation of the projection
+curl localhost:8777/drift                   # COMPARE: quality score + findings
+curl -XPOST localhost:8777/reconcile -d '{"min_quality":60}'   # RECONCILE: proposals -> active
+```
+
+| Endpoint | Fabric Core service | Does |
+|---|---|---|
+| `POST /assert` | Assertion / Observation | append GraphEvent(s); idempotent by id, kernel-enforced at ingestion |
+| `GET /project[?at=SEQ]` | Projection | the emulated graph (optionally as-of a sequence) |
+| `GET /query?q=…` / `?ego=…` | — | BQL query / ego-view of the projection |
+| `GET /verify` | Verification | validation result (correctness drift) |
+| `GET /drift` | Drift | quality score + findings |
+| `POST /reconcile` | Reconciliation | promote proposals → active (gated), emitting events |
+
 ### Run with Docker
 
 The toolchain ships as a container image on GHCR — the `ENTRYPOINT` is `fab`, so
