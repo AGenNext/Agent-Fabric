@@ -63,18 +63,26 @@ class Selector:
         self.kind = None
         self.name = None
         self.filters = []
-        # peel off filter groups [ ... ]
+        # peel off filter groups [ ... ]. These patterns use [^\]]* (linear)
+        # rather than .*? and split the condition with partition rather than a
+        # backtracking regex, so a hostile query (e.g. via `fab serve`'s
+        # /query) cannot trigger polynomial-time matching (ReDoS).
         head = atom
-        for grp in re.findall(r"\[(.*?)\]", atom):
+        for grp in re.findall(r"\[([^\]]*)\]", atom):
             for cond in grp.split(","):
                 cond = cond.strip()
                 if not cond:
                     continue
-                m = re.match(r"^(.+?)\s*(!=|=)\s*(.+)$", cond)
-                if not m:
+                if "!=" in cond:
+                    key, _, val = cond.partition("!=")
+                    op = "!="
+                elif "=" in cond:
+                    key, _, val = cond.partition("=")
+                    op = "="
+                else:
                     raise ValueError(f"bad filter condition: {cond!r}")
-                self.filters.append((m.group(1).strip(), m.group(2), m.group(3).strip()))
-        head = re.sub(r"\[.*?\]", "", head).strip()
+                self.filters.append((key.strip(), op, val.strip()))
+        head = re.sub(r"\[[^\]]*\]", "", head).strip()
         if head and head != "*":
             if ":" in head:
                 self.kind, self.name = head.split(":", 1)

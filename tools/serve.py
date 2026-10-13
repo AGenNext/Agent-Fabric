@@ -168,7 +168,10 @@ class Handler(BaseHTTPRequestHandler):
                     radius = int(q.get("radius", ["1"])[0])
                     return self._send(200, {"nodes": bql.ego(graph, q["ego"][0], radius)})
                 if "q" in q:
-                    return self._send(200, {"results": bql.evaluate(graph, q["q"][0])})
+                    query = q["q"][0]
+                    if len(query) > 4096:
+                        return self._send(413, {"error": "query too long (max 4096 chars)"})
+                    return self._send(200, {"results": bql.evaluate(graph, query)})
                 return self._send(400, {"error": "query requires ?q= or ?ego="})
             if u.path == "/verify":
                 errs, mode = afc.validate_graph(self.store.project())
