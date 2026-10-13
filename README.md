@@ -67,6 +67,13 @@ append-only `GraphEvent` chain), and a **meta-model** (kinds, predicates, and
 lifecycle states are first-class, versioned **registries**). The ecosystem
 graph stays traceable, queryable, and versioned.
 
+> **One model, two altitudes.** This meta-model is not a competing design — it
+> **is** [Fabric Core](specs/fabric-core-v1.md), specialized. The 12 node kinds
+> realize **Entity**, the 22 predicates realize **Relationship**, `GraphEvent`s
+> are **Assertions**/**Observations**, the kernel fold is **Projection**,
+> `fab grade`/validation is **Drift**, and `fab migrate` is **Reconciliation**.
+> The full correspondence is the [Fabric Core ↔ Meta-Model crosswalk](spec/fabric-core-mapping.md).
+
 **Read the spec:** **[`spec/SPECIFICATION.md`](spec/SPECIFICATION.md)** is the
 complete book; [`meta-model`](spec/meta-model.md) · [`dsl`](spec/dsl.md) ·
 [`bql`](spec/bql.md) · [`simulation`](spec/simulation.md) ·
