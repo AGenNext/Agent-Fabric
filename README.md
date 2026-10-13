@@ -67,6 +67,13 @@ append-only `GraphEvent` chain), and a **meta-model** (kinds, predicates, and
 lifecycle states are first-class, versioned **registries**). The ecosystem
 graph stays traceable, queryable, and versioned.
 
+> **One model, two altitudes.** This meta-model is not a competing design — it
+> **is** [Fabric Core](specs/fabric-core-v1.md), specialized. The 12 node kinds
+> realize **Entity**, the 22 predicates realize **Relationship**, `GraphEvent`s
+> are **Assertions**/**Observations**, the kernel fold is **Projection**,
+> `fab grade`/validation is **Drift**, and `fab migrate` is **Reconciliation**.
+> The full correspondence is the [Fabric Core ↔ Meta-Model crosswalk](spec/fabric-core-mapping.md).
+
 **Read the spec:** **[`spec/SPECIFICATION.md`](spec/SPECIFICATION.md)** is the
 complete book; [`meta-model`](spec/meta-model.md) · [`dsl`](spec/dsl.md) ·
 [`bql`](spec/bql.md) · [`simulation`](spec/simulation.md) ·
@@ -136,6 +143,34 @@ python tools/fab.py test
 | `fab test` | conformance | the 34-check e2e suite |
 
 Each subcommand is also a standalone script under [`tools/`](tools/).
+
+### Run as a service
+
+`fab serve` turns the toolchain into a running metabase — the Fabric Core
+kernel-boundary services over HTTP, still pure standard library. Storage is an
+**append-only event log** on disk (`events.jsonl` + optional `base.json`); every
+read is a calculated projection (the kernel fold), durable across restarts.
+
+```bash
+fab serve ./store --port 8777 &
+
+curl -XPOST localhost:8777/assert -d '{"op":"upsert","target":"node",
+  "payload":{"id":"af:agent/new-9","kind":"Agent","state":"proposed"}}'   # ASSERT
+curl localhost:8777/project                 # PROJECT: emulated graph (add ?at=SEQ to time-travel)
+curl 'localhost:8777/query?ego=af:agent/new-9&radius=1'   # query the projection
+curl localhost:8777/verify                  # VERIFY: validation of the projection
+curl localhost:8777/drift                   # COMPARE: quality score + findings
+curl -XPOST localhost:8777/reconcile -d '{"min_quality":60}'   # RECONCILE: proposals -> active
+```
+
+| Endpoint | Fabric Core service | Does |
+|---|---|---|
+| `POST /assert` | Assertion / Observation | append GraphEvent(s); idempotent by id, kernel-enforced at ingestion |
+| `GET /project[?at=SEQ]` | Projection | the emulated graph (optionally as-of a sequence) |
+| `GET /query?q=…` / `?ego=…` | — | BQL query / ego-view of the projection |
+| `GET /verify` | Verification | validation result (correctness drift) |
+| `GET /drift` | Drift | quality score + findings |
+| `POST /reconcile` | Reconciliation | promote proposals → active (gated), emitting events |
 
 ### Run with Docker
 

@@ -157,6 +157,33 @@ for ex in ("schema/examples/graph.example.json", "examples/research.graph.json",
     errs, _ = afc.validate_graph(read(ex))
     check(f"valid: {ex}", not errs)
 
+print("== service (durable append-only store) ==")
+import tempfile                    # noqa: E402
+import serve                       # noqa: E402
+
+with tempfile.TemporaryDirectory() as _d:
+    store = serve.Store(_d)
+    r1 = store.append([{"op": "upsert", "target": "node",
+                        "payload": {"id": "af:agent/svc-1", "kind": "Agent", "state": "proposed"}}])
+    check("assert appends and auto-ids an event", r1["ok"] and r1["appended"] == ["af:event/1"])
+    check("assert is idempotent by id",
+          store.append([{"id": "af:event/1", "op": "upsert", "target": "node",
+                         "payload": {"id": "af:agent/svc-1", "kind": "Agent"}}])["skipped"] == ["af:event/1"])
+    check("ingestion rejects an unregistered kind",
+          not store.append([{"op": "upsert", "target": "node",
+                             "payload": {"id": "af:x/1", "kind": "Nonsense"}}])["ok"])
+    check("projection reflects asserted node",
+          any(n["id"] == "af:agent/svc-1" for n in store.project()["nodes"]))
+    # the rejected event must not have been written
+    check("rejected event is not persisted", len(store.events()) == 1)
+    rep = store.reconcile(0)
+    check("reconcile promotes the proposal", rep["promoted"] == 1 and rep["events_emitted"] == 1)
+    check("projection is active after reconcile",
+          all(n["state"] == "active" for n in store.project()["nodes"] if n["id"] == "af:agent/svc-1"))
+    # durability: a fresh Store over the same dir replays the log
+    check("store is durable (replays the log)",
+          any(n["id"] == "af:agent/svc-1" for n in serve.Store(_d).project()["nodes"]))
+
 passed = sum(1 for _, ok in checks if ok)
 print(f"\n{passed}/{len(checks)} checks passed")
 sys.exit(0 if passed == len(checks) else 1)
