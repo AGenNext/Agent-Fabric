@@ -21,7 +21,6 @@ A selector with no kind is `*`. Filters match node fields then attributes.
 import argparse
 import json
 import os
-import re
 import sys
 from collections import defaultdict
 
@@ -63,12 +62,23 @@ class Selector:
         self.kind = None
         self.name = None
         self.filters = []
-        # peel off filter groups [ ... ]. These patterns use [^\]]* (linear)
-        # rather than .*? and split the condition with partition rather than a
-        # backtracking regex, so a hostile query (e.g. via `fab serve`'s
-        # /query) cannot trigger polynomial-time matching (ReDoS).
-        head = atom
-        for grp in re.findall(r"\[([^\]]*)\]", atom):
+        # Peel off filter groups "[ ... ]" with a single linear scan — no regex,
+        # so a hostile query (e.g. via `fab serve`'s /query) cannot trigger
+        # polynomial-time matching (ReDoS). `head` is everything outside the
+        # brackets; each bracketed group holds comma-separated conditions.
+        head_chars, groups, i, n = [], [], 0, len(atom)
+        while i < n:
+            if atom[i] == "[":
+                j = atom.find("]", i + 1)
+                if j == -1:
+                    raise ValueError(f"unclosed filter bracket in: {atom!r}")
+                groups.append(atom[i + 1:j])
+                i = j + 1
+            else:
+                head_chars.append(atom[i])
+                i += 1
+        head = "".join(head_chars).strip()
+        for grp in groups:
             for cond in grp.split(","):
                 cond = cond.strip()
                 if not cond:
@@ -82,7 +92,6 @@ class Selector:
                 else:
                     raise ValueError(f"bad filter condition: {cond!r}")
                 self.filters.append((key.strip(), op, val.strip()))
-        head = re.sub(r"\[[^\]]*\]", "", head).strip()
         if head and head != "*":
             if ":" in head:
                 self.kind, self.name = head.split(":", 1)
